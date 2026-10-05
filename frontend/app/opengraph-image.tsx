@@ -1,13 +1,13 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "PriceProof: crypto prices verified by GenLayer validator consensus";
+export const alt = "PriceProof // ORACLE TERMINAL — web-verified prices on GenLayer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const rows = [
-  { sym: "BTC", price: "$85,627.99", src: "Coinbase", up: true },
-  { sym: "ETH", price: "$2,700.80", src: "Coinbase", up: true },
-  { sym: "SOL", price: "$120.36", src: "Coinbase", up: false },
+  { sym: "BTC", price: "85627.99", chg: "+1.24%", src: "COINBASE" },
+  { sym: "ETH", price: "2700.80", chg: "+0.61%", src: "COINBASE" },
+  { sym: "SOL", price: "120.36", chg: "-0.42%", src: "KRAKEN" },
 ];
 
 export default function OpengraphImage() {
@@ -18,63 +18,103 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          padding: 64,
-          background: "radial-gradient(900px 520px at 0% 0%, rgba(45,212,191,0.30), transparent 60%), #03110f",
-          color: "#f1f5f9",
-          fontFamily: "sans-serif",
+          flexDirection: "column",
+          background: "#070B09",
+          color: "#D7E0DA",
+          fontFamily: "monospace",
+          padding: 48,
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", width: 600, justifyContent: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottom: "1px solid #1C2620",
+            paddingBottom: 20,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div
               style={{
-                width: 72,
-                height: 72,
-                borderRadius: 20,
-                background: "rgba(45,212,191,0.18)",
-                border: "2px solid rgba(94,234,212,0.5)",
+                width: 48,
+                height: 48,
+                border: "1px solid #00FF9A",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                color: "#00FF9A",
+                fontSize: 18,
+                fontWeight: 700,
               }}
             >
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5eead4" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 17l6-6 4 4 8-8" />
-                <path d="M15 7h6v6" />
-              </svg>
+              PP
             </div>
-            <div style={{ fontSize: 64, fontWeight: 700 }}>PriceProof</div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ fontSize: 36, color: "#00FF9A", letterSpacing: 2 }}>PRICEPROOF</div>
+              <div style={{ fontSize: 18, color: "#8B9A92" }}>// ORACLE TERMINAL</div>
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", marginTop: 32, fontSize: 48, fontWeight: 600, lineHeight: 1.15 }}>
-            <span>Crypto prices,</span>
-            <span style={{ color: "#5eead4" }}>verified by consensus.</span>
-          </div>
-          <div style={{ marginTop: 24, fontSize: 26, color: "#94a3b8", lineHeight: 1.4 }}>
-            Validators fetch prices from the web and must agree within 1.5%. Live status, history and on-chain alerts.
+          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, color: "#8B9A92" }}>
+            <div style={{ width: 10, height: 10, background: "#00FF9A" }} />
+            STUDIONET LIVE
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 18, marginLeft: 48, width: 440 }}>
-          {rows.map((r) => (
+
+        <div style={{ display: "flex", marginTop: 28, gap: 28, flex: 1 }}>
+          <div style={{ display: "flex", flexDirection: "column", width: 520, justifyContent: "center" }}>
+            <div style={{ fontSize: 42, lineHeight: 1.2, color: "#D7E0DA" }}>
+              Web-verified prices.
+            </div>
+            <div style={{ fontSize: 42, lineHeight: 1.2, color: "#00FF9A" }}>Consensus within 1.5%.</div>
+            <div style={{ marginTop: 24, fontSize: 22, color: "#8B9A92", lineHeight: 1.45 }}>
+              Instrument tape · consensus log · on-chain alert tickets.
+            </div>
+            <div style={{ marginTop: 28, fontSize: 18, color: "#F5A623" }}>
+              &gt; PROPOSING… &gt; COMMITTING… &gt; ACCEPTED 5/5
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              border: "1px solid #1C2620",
+              background: "#0F1612",
+            }}
+          >
             <div
-              key={r.sym}
               style={{
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "22px 26px",
-                borderRadius: 20,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                borderBottom: "1px solid #1C2620",
+                padding: "12px 16px",
+                fontSize: 14,
+                letterSpacing: 2,
+                color: "#8B9A92",
               }}
             >
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: 24, fontWeight: 700 }}>{r.sym}</span>
-                <span style={{ fontSize: 18, color: "#94a3b8" }}>verified · {r.src}</span>
-              </div>
-              <span style={{ fontSize: 34, fontWeight: 600, color: r.up ? "#6ee7b7" : "#fda4af" }}>{r.price}</span>
+              SYMBOL&nbsp;&nbsp;&nbsp;LAST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SOURCE
             </div>
-          ))}
-          <div style={{ display: "flex", fontSize: 20, color: "#5eead4" }}>BTC above $100,000 · alert active</div>
+            {rows.map((r) => (
+              <div
+                key={r.sym}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "18px 16px",
+                  borderBottom: "1px solid #1C2620",
+                  fontSize: 22,
+                }}
+              >
+                <span style={{ color: "#00FF9A", width: 70 }}>{r.sym}</span>
+                <span style={{ color: "#D7E0DA", width: 160 }}>{r.price}</span>
+                <span style={{ color: r.chg.startsWith("-") ? "#FF4D4D" : "#00FF9A", width: 90 }}>{r.chg}</span>
+                <span style={{ color: "#F5A623", width: 110 }}>{r.src}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     ),
