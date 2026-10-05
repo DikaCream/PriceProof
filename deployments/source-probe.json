@@ -1,0 +1,76 @@
+{
+  "contractAddress": "0xb0e530cb15E92b2152C339955073a17A055dAD1F",
+  "ranAt": "2026-10-05T05:38:19.020Z",
+  "results": [
+    {
+      "label": "add_asset DOGE (coingecko + kraken)",
+      "hash": "0x633c40d20ffdb9abcbe40cddf3ab4d03eeff5164682e6355ee8071caf57fea4c",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x633c40d20ffdb9abcbe40cddf3ab4d03eeff5164682e6355ee8071caf57fea4c",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "success": true,
+      "result": {
+        "active_alerts": 0,
+        "name": "Dogecoin",
+        "price": "",
+        "price_e8": 0,
+        "source": "",
+        "symbol": "DOGE",
+        "updated_at": 0,
+        "updater": "",
+        "updates": 0
+      }
+    },
+    {
+      "label": "add_asset LTC (kraken only)",
+      "hash": "0x979e0cc5270d6bddd1cd87651a4732219290e261f0e60dc808265283e09026ab",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x979e0cc5270d6bddd1cd87651a4732219290e261f0e60dc808265283e09026ab",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "success": true,
+      "result": {
+        "active_alerts": 0,
+        "name": "Litecoin",
+        "price": "",
+        "price_e8": 0,
+        "source": "",
+        "symbol": "LTC",
+        "updated_at": 0,
+        "updater": "",
+        "updates": 0
+      }
+    },
+    {
+      "label": "update_price DOGE",
+      "hash": "0x02384d3e421286a18b1f2c7d7d1d2186973c4c071a3cbde09c030afc447b7e18",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x02384d3e421286a18b1f2c7d7d1d2186973c4c071a3cbde09c030afc447b7e18",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "success": true,
+      "result": {
+        "price": "0.09527",
+        "price_e8": 9527000,
+        "source": "coingecko",
+        "symbol": "DOGE",
+        "timestamp": 1791178683
+      }
+    },
+    {
+      "label": "update_price LTC",
+      "hash": "0x87158051e7ff4e0a4d89ef6670167eeed463c6a149d1c0d63f67f72a680694f3",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x87158051e7ff4e0a4d89ef6670167eeed463c6a149d1c0d63f67f72a680694f3",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "success": true,
+      "result": {
+        "price": "69.82",
+        "price_e8": 6982000000,
+        "source": "kraken",
+        "symbol": "LTC",
+        "timestamp": 1791178688
+      }
+    }
+  ],
+  "coingeckoWorks": true,
+  "krakenWorks": true
+}
