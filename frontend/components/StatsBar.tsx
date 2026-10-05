@@ -5,18 +5,19 @@ import { useStats } from "@/lib/hooks";
 export function StatsBar() {
   const { data } = useStats();
   const items = [
-    { label: "Assets", value: data?.assets, hint: "tracked" },
-    { label: "Verifications", value: data?.updates, hint: `${data?.updaters ?? "-"} updaters` },
-    { label: "Alerts", value: data?.alerts, hint: `${data?.active ?? "-"} active` },
-    { label: "Triggered", value: data?.triggered, hint: `${data?.cancelled ?? "-"} cancelled` },
+    { k: "ASSETS", v: data?.assets },
+    { k: "VERIFS", v: data?.updates },
+    { k: "UPDATERS", v: data?.updaters },
+    { k: "ALERTS", v: data?.alerts },
+    { k: "ACTIVE", v: data?.active },
+    { k: "TRIGGERED", v: data?.triggered },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {items.map((it) => (
-        <div key={it.label} className="rounded-xl border border-white/5 bg-white/[0.025] px-4 py-3">
-          <p className="text-[11px] uppercase tracking-wider text-slate-500">{it.label}</p>
-          <p className="mt-1 font-mono text-2xl font-semibold tabular-nums text-slate-100">{it.value ?? "-"}</p>
-          <p className="text-[11px] text-slate-500">{it.hint}</p>
+    <div className="grid grid-cols-3 border border-[#1C2620] sm:grid-cols-6">
+      {items.map((it, i) => (
+        <div key={it.k} className={`bg-[#0F1612] px-3 py-2 ${i ? "border-l border-[#1C2620]" : ""}`}>
+          <div className="font-mono text-[9px] tracking-[0.18em] text-[#8B9A92]">{it.k}</div>
+          <div className="mt-0.5 font-mono text-lg tabular-nums text-[#00FF9A]">{it.v ?? "—"}</div>
         </div>
       ))}
     </div>

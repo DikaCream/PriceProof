@@ -1,27 +1,38 @@
 import { TOLERANCE_PCT } from "@/lib/config";
 
-const steps = [
-  { title: "Request", body: "Anyone calls update_price(symbol) from MetaMask. Studionet is gasless." },
-  { title: "Leader fetches", body: "The leader validator reads the USD spot price from Coinbase, falling back to CoinGecko, then Kraken." },
-  { title: "Validators verify", body: `Every validator fetches the price on its own and accepts only if it is within ${TOLERANCE_PCT}% of the leader's.` },
-  { title: "Stored + alerts", body: "The agreed price, time, source and updater are stored with a 48-point history, and matching alerts fire on-chain." },
-];
-
 export function HowItWorks() {
   return (
-    <section id="how" className="rounded-2xl border border-white/5 bg-white/[0.03] p-5">
-      <h3 className="text-sm font-semibold text-slate-100">How it works</h3>
-      <ol className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map((s, i) => (
-          <li key={s.title} className="flex gap-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-teal-400/15 font-mono text-xs text-teal-200 ring-1 ring-teal-300/30">{i + 1}</span>
-            <div>
-              <p className="text-sm font-medium text-slate-100">{s.title}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate-400">{s.body}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+    <section id="how" className="border border-[#1C2620] bg-[#0F1612] font-mono text-[12px] leading-6">
+      <div className="border-b border-[#1C2620] px-3 py-2 text-[11px] tracking-[0.18em] text-[#8B9A92]">
+        <span className="text-[#00FF9A]">MAN</span> // PRICEPROOF(1)
+      </div>
+      <pre className="overflow-x-auto whitespace-pre-wrap p-3 text-[#D7E0DA]">{`NAME
+    priceproof — web-verified crypto price oracle on GenLayer
+
+SYNOPSIS
+    update_price(SYMBOL)   create_alert(SYM, TARGET, DIR, NOTE)
+    check_alert(ID)        cancel_alert(ID)
+
+DESCRIPTION
+    PRICEPROOF lets Studionet validators each fetch a USD spot price
+    from the open web. Consensus accepts the leader's price only when
+    every validator is within ${TOLERANCE_PCT}% of that value.
+
+PIPELINE
+    1. REQUEST     Anyone calls update_price from MetaMask (gasless).
+    2. LEADER      Reads Coinbase → CoinGecko → Kraken fallback chain.
+    3. VALIDATE    Peers re-fetch independently; reject outliers.
+    4. COMMIT      Store price, timestamp, source, updater + 48-pt tape.
+    5. ALERTS      Matching on-chain orders fire when the tape crosses.
+
+KEYS
+    V     verify the selected instrument
+    /     focus ORDER_ENTRY target field
+    Esc   clear instrument selection
+
+SEE ALSO
+    GenLayer Studionet, MetaMask, explorer-studio.genlayer.com
+`}</pre>
     </section>
   );
 }
