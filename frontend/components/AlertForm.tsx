@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { MAX_NOTE_LENGTH } from "@/lib/config";
 import { usd } from "@/lib/format";
 import { usePrices, useTx } from "@/lib/hooks";
 import { useWallet } from "@/lib/WalletProvider";
 import { TxSteps } from "./TxSteps";
 
-export function AlertForm() {
+export type AlertFormHandle = { focus: () => void };
+
+export const AlertForm = forwardRef<AlertFormHandle>(function AlertForm(_props, ref) {
   const { address, isCorrectChain } = useWallet();
   const { data: prices = [] } = usePrices();
   const [symbol, setSymbol] = useState("BTC");
@@ -16,6 +18,11 @@ export function AlertForm() {
   const [note, setNote] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const tx = useTx();
+  const targetRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => targetRef.current?.focus(),
+  }));
 
   const current = prices.find((p) => p.symbol === symbol);
   const validTarget = /^\d+(\.\d{1,8})?$/.test(target.trim()) && Number(target) > 0;
@@ -29,8 +36,8 @@ export function AlertForm() {
       const v = res.values;
       setResult(
         v.status === "triggered"
-          ? `Alert #${v.id} created and triggered immediately at $${v.triggered_price}`
-          : `Alert #${v.id ?? ""} is active. It triggers when a verified ${symbol} price goes ${direction} $${v.target ?? target}`,
+          ? `ORDER #${v.id} FILLED @ $${v.triggered_price}`
+          : `ORDER #${v.id ?? ""} ARMED · ${symbol} ${direction.toUpperCase()} $${v.target ?? target}`,
       );
       setTarget("");
       setNote("");
@@ -38,70 +45,81 @@ export function AlertForm() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-white/5 bg-white/[0.03] p-5">
-      <h3 className="text-sm font-semibold text-slate-100">Create a price alert</h3>
-      <p className="mt-1 text-xs text-slate-500">Alerts are checked on-chain against every verified price, so anyone can see when they fire.</p>
-
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <select
-          value={symbol}
-          onChange={(e) => setSymbol(e.target.value)}
-          className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 outline-none focus:border-teal-300/50"
-          aria-label="Asset"
-        >
-          {(prices.length ? prices.map((p) => p.symbol) : ["BTC", "ETH", "SOL"]).map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-        <div className="flex rounded-lg border border-white/10 p-0.5" role="radiogroup" aria-label="Direction">
-          {(["above", "below"] as const).map((d) => (
-            <button
-              key={d}
-              type="button"
-              onClick={() => setDirection(d)}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize ${
-                direction === d ? (d === "above" ? "bg-emerald-400/20 text-emerald-200" : "bg-rose-400/20 text-rose-200") : "text-slate-400"
-              }`}
-            >
-              {d === "above" ? "▲ above" : "▼ below"}
-            </button>
-          ))}
+    <form id="order-entry" onSubmit={submit} className="border border-[#1C2620] bg-[#0F1612]">
+      <div className="flex items-center justify-between border-b border-[#1C2620] px-3 py-2">
+        <div className="font-mono text-[11px] tracking-[0.18em] text-[#8B9A92]">
+          <span className="text-[#F5A623]">ORDER_ENTRY</span> // CREATE ALERT
         </div>
+        <div className="font-mono text-[10px] text-[#8B9A92]">cmd:/</div>
       </div>
-
-      <label className="mt-2 block">
-        <span className="sr-only">Target price in USD</span>
-        <div className="flex items-center rounded-lg border border-white/10 bg-slate-950/60 px-3 focus-within:border-teal-300/50">
-          <span className="text-sm text-slate-500">$</span>
-          <input
-            value={target}
-            onChange={(e) => setTarget(e.target.value.replace(/[^\d.]/g, ""))}
-            placeholder={current?.price_e8 ? (current.price_e8 / 1e8).toFixed(2) : "Target price"}
-            inputMode="decimal"
-            className="w-full bg-transparent px-2 py-2 font-mono text-sm text-slate-100 outline-none placeholder:text-slate-600"
-          />
+      <div className="space-y-2 p-3">
+        <div className="font-mono text-[11px] text-[#8B9A92]">
+          <span className="text-[#00FF9A]">$</span> new_alert{" "}
+          <span className="text-[#D7E0DA]">
+            --sym {symbol} --dir {direction} --px {target || "?"}
+          </span>
+          <span className="blink-cursor" />
         </div>
-      </label>
-      <p className="mt-1 text-[11px] text-slate-500">Last verified {symbol}: {current?.price_e8 ? usd(current.price_e8) : "not verified yet"}</p>
 
-      <input
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        maxLength={MAX_NOTE_LENGTH}
-        placeholder="Note (optional), e.g. take profit"
-        className="mt-2 w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-teal-300/50"
-      />
+        <div className="grid grid-cols-2 gap-2">
+          <select value={symbol} onChange={(e) => setSymbol(e.target.value)} className="pp-select" aria-label="Asset">
+            {(prices.length ? prices.map((p) => p.symbol) : ["BTC", "ETH", "SOL"]).map((s) => (
+              <option key={s}>{s}</option>
+            ))}
+          </select>
+          <div className="grid grid-cols-2 border border-[#1C2620]" role="radiogroup" aria-label="Direction">
+            {(["above", "below"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setDirection(d)}
+                className={`px-2 py-2 font-mono text-[11px] uppercase ${
+                  direction === d
+                    ? d === "above"
+                      ? "bg-[#00FF9A]/15 text-[#00FF9A]"
+                      : "bg-[#FF4D4D]/15 text-[#FF4D4D]"
+                    : "text-[#8B9A92]"
+                }`}
+              >
+                {d === "above" ? "▲ ABOVE" : "▼ BELOW"}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="mt-3 w-full rounded-lg bg-teal-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-teal-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-slate-500"
-      >
-        {!address ? "Connect MetaMask to create alerts" : tx.busy ? "Creating…" : "Create alert"}
-      </button>
-      <TxSteps status={tx.status} hash={tx.hash} />
-      {result && <p className="mt-2 text-xs text-emerald-300">✓ {result}</p>}
-      {tx.error && <p className="mt-2 text-xs text-rose-300">{tx.error}</p>}
+        <label className="block">
+          <span className="mb-1 block font-mono text-[10px] tracking-widest text-[#8B9A92]">TARGET_USD</span>
+          <div className="flex items-center border border-[#1C2620] bg-[#070B09] focus-within:border-[#00FF9A]">
+            <span className="px-2 font-mono text-sm text-[#8B9A92]">$</span>
+            <input
+              ref={targetRef}
+              value={target}
+              onChange={(e) => setTarget(e.target.value.replace(/[^\d.]/g, ""))}
+              placeholder={current?.price_e8 ? (current.price_e8 / 1e8).toFixed(2) : "0.00"}
+              inputMode="decimal"
+              className="w-full bg-transparent py-2 pr-3 font-mono text-sm text-[#D7E0DA] outline-none placeholder:text-[#8B9A92]/40"
+            />
+          </div>
+        </label>
+        <p className="font-mono text-[10px] text-[#8B9A92]">
+          LAST {symbol}: {current?.price_e8 ? usd(current.price_e8) : "UNVERIFIED"}
+        </p>
+
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={MAX_NOTE_LENGTH}
+          placeholder="NOTE (optional)"
+          className="pp-input"
+        />
+
+        <button type="submit" disabled={!canSubmit} className="pp-btn w-full">
+          {!address ? "CONNECT TO SEND" : tx.busy ? "SUBMITTING…" : "SEND ORDER [ENTER]"}
+        </button>
+        <TxSteps status={tx.status} hash={tx.hash} compact />
+        {result && <p className="font-mono text-[11px] text-[#00FF9A]">&gt; {result}</p>}
+        {tx.error && <p className="font-mono text-[11px] text-[#FF4D4D]">&gt; ERR {tx.error}</p>}
+      </div>
     </form>
   );
-}
+});
