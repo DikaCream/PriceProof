@@ -1,37 +1,69 @@
 import type { PricePoint } from "@/lib/priceproof";
 
-/** Tiny SVG line chart of verified prices (oldest → newest). */
-export function Sparkline({ points, height = 44 }: { points: PricePoint[]; height?: number }) {
+/** Tiny SVG line chart of verified prices (oldest → newest). Terminal palette. */
+export function Sparkline({
+  points,
+  height = 28,
+  width = 96,
+  className = "",
+}: {
+  points: PricePoint[];
+  height?: number;
+  width?: number;
+  className?: string;
+}) {
   const series = [...points].reverse().map((p) => p.price_e8);
-  const width = 240;
-  if (series.length < 2) {
+  const w = width;
+  const h = height;
+
+  if (series.length === 0) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-dashed border-white/10 text-[11px] text-slate-500" style={{ height }}>
-        {series.length === 1 ? "1 verified point. Verify again to draw a chart" : "No history yet"}
+      <div
+        className={`flex items-center justify-center border border-dashed border-[#1C2620] font-mono text-[10px] text-[#8B9A92] ${className}`}
+        style={{ height: h }}
+      >
+        —
       </div>
     );
   }
+
+  if (series.length === 1) {
+    const y = h / 2;
+    return (
+      <svg viewBox={`0 0 ${w} ${h}`} className={className} style={{ height: h, width: "100%" }} aria-label="Price history">
+        <line x1="4" y1={y} x2={w - 4} y2={y} stroke="#1C2620" strokeWidth="1" strokeDasharray="2 3" />
+        <rect x={w / 2 - 2} y={y - 2} width="4" height="4" fill="#00FF9A" />
+      </svg>
+    );
+  }
+
   const min = Math.min(...series);
   const max = Math.max(...series);
   const span = max - min || 1;
-  const step = width / (series.length - 1);
-  const coords = series.map((v, i) => [i * step, height - 4 - ((v - min) / span) * (height - 8)] as const);
+  const step = w / (series.length - 1);
+  const coords = series.map((v, i) => [i * step, h - 3 - ((v - min) / span) * (h - 6)] as const);
   const line = coords.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   const up = series[series.length - 1] >= series[0];
-  const color = up ? "#34d399" : "#fb7185";
-  const area = `0,${height} ${line} ${width},${height}`;
+  const color = up ? "#00FF9A" : "#FF4D4D";
   const [lx, ly] = coords[coords.length - 1];
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="w-full" style={{ height }} aria-label="Price history">
-      <defs>
-        <linearGradient id={`fill-${up ? "up" : "down"}`} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.25" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon points={area} fill={`url(#fill-${up ? "up" : "down"})`} />
-      <polyline points={line} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-      <circle cx={lx} cy={ly} r="3" fill={color} />
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      className={className}
+      style={{ height: h, width: "100%" }}
+      aria-label="Price history"
+    >
+      <polyline
+        points={line}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinejoin="miter"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
+      />
+      <rect x={lx - 1.5} y={ly - 1.5} width="3" height="3" fill={color} />
     </svg>
   );
 }
