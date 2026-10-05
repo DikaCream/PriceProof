@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#03110f"/><path d="M12 44l12-14 9 8 17-20" fill="none" stroke="#2dd4bf" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 18h10v10" fill="none" stroke="#2dd4bf" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#070B09"/>
+  <rect x="1" y="1" width="62" height="62" fill="none" stroke="#1C2620" stroke-width="2"/>
+  <text x="8" y="18" fill="#00FF9A" font-family="monospace" font-size="10" font-weight="700">PP</text>
+  <polyline points="10,48 22,34 32,40 46,18 54,18" fill="none" stroke="#00FF9A" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <line x1="46" y1="18" x2="54" y2="18" stroke="#00FF9A" stroke-width="2.5"/>
+  <line x1="54" y1="18" x2="54" y2="26" stroke="#00FF9A" stroke-width="2.5"/>
+  <rect x="8" y="54" width="48" height="2" fill="#1C2620"/>
+  <rect x="8" y="54" width="28" height="2" fill="#00FF9A"/>
+</svg>
