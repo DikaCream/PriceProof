@@ -1,120 +1,50 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "PriceProof // ORACLE TERMINAL — web-verified prices on GenLayer";
+export const alt = "PriceProof // MARKET TERMINAL — prediction markets resolved by GenLayer AI validators from the web";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const rows = [
-  { sym: "BTC", price: "85627.99", chg: "+1.24%", src: "COINBASE" },
-  { sym: "ETH", price: "2700.80", chg: "+0.61%", src: "COINBASE" },
-  { sym: "SOL", price: "120.36", chg: "-0.42%", src: "KRAKEN" },
+  { id: "#0", q: "Did Argentina win the 2022 World Cup final?", yes: 74, st: "FINALIZED", out: "YES" },
+  { id: "#1", q: "Will the Fed cut rates at its next meeting?", yes: 58, st: "OPEN", out: "T-02:14:09" },
+  { id: "#2", q: "Did Croatia win the 2018 World Cup final?", yes: 31, st: "PROPOSED", out: "NO" },
 ];
 
 export default function OpengraphImage() {
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          background: "#070B09",
-          color: "#D7E0DA",
-          fontFamily: "monospace",
-          padding: 48,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: "1px solid #1C2620",
-            paddingBottom: 20,
-          }}
-        >
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#070B09", color: "#D7E0DA", fontFamily: "monospace", padding: 48 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1C2620", paddingBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                border: "1px solid #00FF9A",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#00FF9A",
-                fontSize: 18,
-                fontWeight: 700,
-              }}
-            >
-              PP
-            </div>
+            <div style={{ width: 48, height: 48, border: "1px solid #00FF9A", display: "flex", alignItems: "center", justifyContent: "center", color: "#00FF9A", fontSize: 18, fontWeight: 700 }}>PP</div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div style={{ fontSize: 36, color: "#00FF9A", letterSpacing: 2 }}>PRICEPROOF</div>
-              <div style={{ fontSize: 18, color: "#8B9A92" }}>// ORACLE TERMINAL</div>
+              <div style={{ fontSize: 18, color: "#8B9A92" }}>// MARKET TERMINAL</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, color: "#8B9A92" }}>
             <div style={{ width: 10, height: 10, background: "#00FF9A" }} />
-            STUDIONET LIVE
+            GENLAYER STUDIONET
           </div>
         </div>
-
-        <div style={{ display: "flex", marginTop: 28, gap: 28, flex: 1 }}>
-          <div style={{ display: "flex", flexDirection: "column", width: 520, justifyContent: "center" }}>
-            <div style={{ fontSize: 42, lineHeight: 1.2, color: "#D7E0DA" }}>
-              Web-verified prices.
-            </div>
-            <div style={{ fontSize: 42, lineHeight: 1.2, color: "#00FF9A" }}>Consensus within 1.5%.</div>
-            <div style={{ marginTop: 24, fontSize: 22, color: "#8B9A92", lineHeight: 1.45 }}>
-              Instrument tape · consensus log · on-chain alert tickets.
-            </div>
-            <div style={{ marginTop: 28, fontSize: 18, color: "#F5A623" }}>
-              &gt; PROPOSING… &gt; COMMITTING… &gt; ACCEPTED 5/5
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              border: "1px solid #1C2620",
-              background: "#0F1612",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                borderBottom: "1px solid #1C2620",
-                padding: "12px 16px",
-                fontSize: 14,
-                letterSpacing: 2,
-                color: "#8B9A92",
-              }}
-            >
-              SYMBOL&nbsp;&nbsp;&nbsp;LAST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SOURCE
-            </div>
-            {rows.map((r) => (
-              <div
-                key={r.sym}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "18px 16px",
-                  borderBottom: "1px solid #1C2620",
-                  fontSize: 22,
-                }}
-              >
-                <span style={{ color: "#00FF9A", width: 70 }}>{r.sym}</span>
-                <span style={{ color: "#D7E0DA", width: 160 }}>{r.price}</span>
-                <span style={{ color: r.chg.startsWith("-") ? "#FF4D4D" : "#00FF9A", width: 90 }}>{r.chg}</span>
-                <span style={{ color: "#F5A623", width: 110 }}>{r.src}</span>
+        <div style={{ display: "flex", flexDirection: "column", marginTop: 30 }}>
+          <div style={{ fontSize: 46, lineHeight: 1.15 }}>Prediction markets resolved</div>
+          <div style={{ fontSize: 46, lineHeight: 1.15, color: "#00FF9A" }}>by AI validators reading the web.</div>
+          <div style={{ marginTop: 14, fontSize: 21, color: "#8B9A92" }}>Frozen sources · verbatim evidence on-chain · dispute window · appeal round</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", marginTop: 30, border: "1px solid #1C2620", background: "#0F1612" }}>
+          {rows.map((r) => (
+            <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 18, padding: "12px 18px", borderBottom: "1px solid #1C2620", fontSize: 19 }}>
+              <div style={{ color: "#8B9A92", width: 36 }}>{r.id}</div>
+              <div style={{ flex: 1, color: "#D7E0DA" }}>{r.q}</div>
+              <div style={{ color: "#00FF9A", width: 90 }}>{`Y ${r.yes}%`}</div>
+              <div style={{ display: "flex", width: 120, height: 8, background: "#FF4D4D" }}>
+                <div style={{ width: `${r.yes}%`, height: 8, background: "#00FF9A" }} />
               </div>
-            ))}
-          </div>
+              <div style={{ width: 130, color: r.st === "OPEN" ? "#00FF9A" : r.st === "PROPOSED" ? "#F5A623" : "#8B9A92" }}>{r.st}</div>
+              <div style={{ width: 130, color: r.out === "YES" ? "#00FF9A" : r.out === "NO" ? "#FF4D4D" : "#D7E0DA" }}>{r.out}</div>
+            </div>
+          ))}
         </div>
       </div>
     ),

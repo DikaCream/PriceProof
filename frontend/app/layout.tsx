@@ -18,9 +18,9 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const title = "PriceProof // ORACLE TERMINAL";
+const title = "PriceProof // MARKET TERMINAL";
 const description =
-  "Terminal for GenLayer web-verified crypto prices. Validators fetch BTC, ETH and SOL from the open web and must agree within 1.5%. Live consensus, instrument table, on-chain alerts.";
+  "Prediction markets on real-world events, resolved by GenLayer AI validators that read frozen web sources, agree on the outcome, cite verbatim evidence on-chain, and open a dispute window before payout.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
