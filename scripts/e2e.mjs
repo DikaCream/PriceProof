@@ -50,10 +50,10 @@ for (const w of ["A", "B"]) {
 
 // --- invalid markets
 await write("deterministic rejection: URL shortener source", "A", "create_market",
-  ["Did Argentina win the 2022 FIFA World Cup final?", "YES if the source states Argentina won the final, NO otherwise.", ["https://bit.ly/3xyz"], now() + 600, "SPORTS", 120], { expectFail: true });
+  ["Did Argentina win the 2022 FIFA World Cup final?", "YES if the source states Argentina won the final, NO otherwise.", ["https://bit.ly/3xyz"], now() + 600, "SPORTS", 120, 3600], { expectFail: true });
 const before = (await read("get_stats")).markets;
 await write("AI validity check: subjective question", "A", "create_market",
-  ["Is Lionel Messi the greatest footballer of all time?", "YES if Messi is the best player ever, NO otherwise, based on general opinion.", ["https://en.wikipedia.org/wiki/Lionel_Messi"], now() + 600, "SPORTS", 120]);
+  ["Is Lionel Messi the greatest footballer of all time?", "YES if Messi is the best player ever, NO otherwise, based on general opinion.", ["https://en.wikipedia.org/wiki/Lionel_Messi"], now() + 600, "SPORTS", 120, 3600]);
 const invalid = await read("get_market", [before]);
 console.log("invalid market:", invalid.status, invalid.invalid_reason);
 
@@ -63,12 +63,12 @@ const m1id = (await read("get_stats")).markets;
 await write("create market M1 (Argentina 2022)", "A", "create_market",
   ["Did Argentina win the 2022 FIFA World Cup final?",
    "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
-   [WIKI22], deadline, "SPORTS", 120]);
+   [WIKI22], deadline, "SPORTS", 120, 3600]);
 const m2id = m1id + 1;
 await write("create market M2 (Croatia 2018, expect NO)", "A", "create_market",
   ["Did Croatia win the 2018 FIFA World Cup final?",
    "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
-   [WIKI18], deadline + 20, "SPORTS", 60]);
+   [WIKI18], deadline + 20, "SPORTS", 60, 3600]);
 for (const id of [m1id, m2id]) {
   await write(`stake YES 300 on M${id - m1id + 1}`, "A", "stake", [id, "YES", 300]);
   await write(`stake NO 200 on M${id - m1id + 1}`, "B", "stake", [id, "NO", 200]);

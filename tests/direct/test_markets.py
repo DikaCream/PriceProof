@@ -30,7 +30,7 @@ def setup(vm, valid=True):
 def new_market(vm, c, who, sources=None, window=300, valid=True, q=Q):
     setup(vm, valid)
     vm.sender = who
-    return c.create_market(q, CRIT, sources or [WIKI, BBC], T0_TS + 120, "sports", window)
+    return c.create_market(q, CRIT, sources or [WIKI, BBC], T0_TS + 120, "sports", window, 120)
 
 
 def staked(vm, deploy, alice, bob, yes=300, no=200):
@@ -90,7 +90,7 @@ def test_source_rules(direct_vm, direct_deploy, direct_alice, url, err):
     setup(direct_vm)
     direct_vm.sender = direct_alice
     with direct_vm.expect_revert(err):
-        c.create_market(Q, CRIT, [url], T0_TS + 120, "SPORTS", 300)
+        c.create_market(Q, CRIT, [url], T0_TS + 120, "SPORTS", 300, 120)
 
 
 def test_creation_input_rules(direct_vm, direct_deploy, direct_alice):
@@ -98,15 +98,15 @@ def test_creation_input_rules(direct_vm, direct_deploy, direct_alice):
     setup(direct_vm)
     direct_vm.sender = direct_alice
     with direct_vm.expect_revert("1-3 source"):
-        c.create_market(Q, CRIT, [WIKI, BBC, EXTRA, "https://apnews.com/x"], T0_TS + 120, "SPORTS", 300)
+        c.create_market(Q, CRIT, [WIKI, BBC, EXTRA, "https://apnews.com/x"], T0_TS + 120, "SPORTS", 300, 120)
     with direct_vm.expect_revert("Duplicate"):
-        c.create_market(Q, CRIT, [WIKI, WIKI], T0_TS + 120, "SPORTS", 300)
+        c.create_market(Q, CRIT, [WIKI, WIKI], T0_TS + 120, "SPORTS", 300, 120)
     with direct_vm.expect_revert("Deadline"):
-        c.create_market(Q, CRIT, [WIKI], T0_TS + 10, "SPORTS", 300)
+        c.create_market(Q, CRIT, [WIKI], T0_TS + 10, "SPORTS", 300, 120)
     with direct_vm.expect_revert("end with"):
-        c.create_market("Argentina won the final", CRIT, [WIKI], T0_TS + 120, "SPORTS", 300)
+        c.create_market("Argentina won the final", CRIT, [WIKI], T0_TS + 120, "SPORTS", 300, 120)
     with direct_vm.expect_revert("Dispute window"):
-        c.create_market(Q, CRIT, [WIKI], T0_TS + 120, "SPORTS", 5)
+        c.create_market(Q, CRIT, [WIKI], T0_TS + 120, "SPORTS", 5, 120)
 
 
 def test_strict_domain_mode(direct_vm, direct_deploy, direct_alice, direct_bob):
@@ -119,8 +119,8 @@ def test_strict_domain_mode(direct_vm, direct_deploy, direct_alice, direct_bob):
     c.set_strict_domains(True)
     setup(direct_vm)
     with direct_vm.expect_revert("allowlist"):
-        c.create_market(Q, CRIT, ["https://someblog.example.com/post"], T0_TS + 120, "SPORTS", 300)
-    assert c.create_market(Q, CRIT, [WIKI], T0_TS + 120, "SPORTS", 300)["status"] == "OPEN"
+        c.create_market(Q, CRIT, ["https://someblog.example.com/post"], T0_TS + 120, "SPORTS", 300, 120)
+    assert c.create_market(Q, CRIT, [WIKI], T0_TS + 120, "SPORTS", 300, 120)["status"] == "OPEN"
 
 
 # ------------------------------------------------------------ staking
@@ -289,3 +289,60 @@ def test_no_winners_refund_and_pagination(direct_vm, direct_deploy, direct_alice
     page = c.get_markets("ALL", 1, 2)
     assert page["total"] == 4 and [x["id"] for x in page["items"]] == [2, 1]
     assert c.get_config()["dispute_bond"] == 100
+
+
+# ------------------------------------------------------------ dispute timeout
+
+
+def disputed(vm, deploy, alice, bob):
+    c, mid = staked(vm, deploy, alice, bob)
+    resolve_with(vm, c, mid, verdict("YES"))  # at 00:03:00
+    vm.sender = bob
+    c.dispute(mid, "Validators misread the page entirely.", "")
+    return c, mid
+
+
+def test_dispute_timeout_refunds_all(direct_vm, direct_deploy, direct_alice, direct_bob):
+    c, mid = disputed(direct_vm, direct_deploy, direct_alice, direct_bob)
+    assert c.get_market(mid)["timeout_at"] == T0_TS + 180 + 120
+    assert c.get_user(to_hex(direct_bob))["balance"] == 700
+    direct_vm.warp("2026-10-01T00:05:01Z")
+    direct_vm.sender = direct_alice  # anyone may expire
+    m = c.expire_dispute(mid)
+    assert m["status"] == "VOID_TIMEOUT" and m["dispute_result"] == "TIMEOUT"
+    assert c.get_user(to_hex(direct_bob))["balance"] == 800  # bond returned
+    ev = c.get_evidence(mid)
+    assert ev[-1]["kind"] == "TIMEOUT" and ev[-1]["outcome"] == "VOID"
+    assert c.get_position(mid, to_hex(direct_alice))["claimable"] == 300
+    assert c.claim(mid)["payout"] == 300
+    direct_vm.sender = direct_bob
+    assert c.claim(mid)["payout"] == 200
+    assert c.get_user(to_hex(direct_bob))["balance"] == 1000
+    assert c.get_stats()["by_status"]["VOID_TIMEOUT"] == 1
+
+
+def test_expire_dispute_too_early_reverts(direct_vm, direct_deploy, direct_alice, direct_bob):
+    c, mid = disputed(direct_vm, direct_deploy, direct_alice, direct_bob)
+    direct_vm.warp("2026-10-01T00:04:59Z")
+    with direct_vm.expect_revert("timeout not reached"):
+        c.expire_dispute(mid)
+
+
+def test_expire_dispute_after_resolution_reverts(direct_vm, direct_deploy, direct_alice, direct_bob):
+    c, mid = disputed(direct_vm, direct_deploy, direct_alice, direct_bob)
+    direct_vm.clear_mocks()
+    direct_vm.mock_web(r"wikipedia\.org", {"status": 200, "body": PAGE})
+    direct_vm.mock_web(r"bbc\.com", {"status": 200, "body": PAGE})
+    direct_vm.mock_llm(r"APPEAL ROUND", verdict("YES"))
+    c.resolve_dispute(mid)
+    direct_vm.warp("2026-10-02T00:00:00Z")
+    with direct_vm.expect_revert("not disputed"):
+        c.expire_dispute(mid)
+
+
+def test_timeout_bounds(direct_vm, direct_deploy, direct_alice):
+    c = direct_deploy(CONTRACT)
+    setup(direct_vm)
+    direct_vm.sender = direct_alice
+    with direct_vm.expect_revert("Dispute timeout"):
+        c.create_market(Q, CRIT, [WIKI], T0_TS + 120, "SPORTS", 300, 10)
