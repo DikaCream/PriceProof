@@ -86,7 +86,7 @@ function EvidenceLog({ m }: { m: Market }) {
     if (r.kind === "APPEAL" && disputeLine) lines.push({ ...disputeLine, t: r.timestamp });
     lines.push({
       t: r.timestamp,
-      c: r.kind === "APPEAL" ? "text-[#F5A623]" : "text-[#D7E0DA]",
+      c: r.kind === "TIMEOUT" ? "text-[#F5A623]" : r.kind === "APPEAL" ? "text-[#F5A623]" : "text-[#D7E0DA]",
       text: (
         <div>
           <div>
@@ -104,7 +104,8 @@ function EvidenceLog({ m }: { m: Market }) {
     });
   });
   if (disputeLine && m.status === "DISPUTED") lines.push(disputeLine);
-  if (m.dispute_result) lines.push({ t: m.finalized_at, c: "text-[#F5A623]", text: `DISPUTE ${m.dispute_result}${m.dispute_result === "FLIPPED" ? " — bond returned + reward" : " — bond slashed to winners' pool"}` });
+  if (m.dispute_result && m.dispute_result !== "TIMEOUT") lines.push({ t: m.finalized_at, c: "text-[#F5A623]", text: `DISPUTE ${m.dispute_result}${m.dispute_result === "FLIPPED" ? " — bond returned + reward" : " — bond slashed to winners' pool"}` });
+  if (m.status === "VOID_TIMEOUT") lines.push({ t: m.finalized_at, c: "text-[#F5A623]", text: "VOID_TIMEOUT :: market voided — all stakes refundable, dispute bond returned" });
   if (m.status === "FINALIZED") lines.push({ t: m.finalized_at, c: "text-[#00FF9A]", text: `FINALIZED :: ${m.outcome}${m.outcome === "UNRESOLVABLE" ? " — all stakes refunded" : ""}` });
   return (
     <div className="max-h-[420px] overflow-y-auto bg-[#070B09] px-3 py-2 font-mono text-[11px] leading-5">
@@ -167,15 +168,28 @@ function Actions({ m, now }: { m: Market; now: number }) {
         </div>
       )}
       {m.status === "DISPUTED" && (
-        <button className="pp-btn pp-btn-amber w-full" disabled={tx.busy} onClick={() => tx.run("resolve_dispute", [m.id])}>[RUN APPEAL ROUND]</button>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between border border-[#FF4D4D]/40 px-2 py-2">
+            <span className="text-[#FF4D4D]">DISPUTE TIMEOUT</span>
+            <span className="text-[16px] tabular-nums text-[#FF4D4D]">{m.timeout_at > now ? countdown(m.timeout_at - now) : "REACHED"}</span>
+          </div>
+          <button className="pp-btn pp-btn-amber w-full" disabled={tx.busy} onClick={() => tx.run("resolve_dispute", [m.id])}>[RUN APPEAL ROUND]</button>
+          <button className="pp-btn pp-btn-red w-full" disabled={tx.busy || m.timeout_at > now} onClick={() => tx.run("expire_dispute", [m.id])}>
+            [EXPIRE DISPUTE — VOID &amp; REFUND ALL]
+          </button>
+          <div className="text-[10px] text-[#8B9A92]">If no appeal round succeeds before the timeout, anyone can void the market: every stake is refunded and the bond is returned.</div>
+        </div>
+      )}
+      {m.status === "VOID_TIMEOUT" && (
+        <div className="border border-[#F5A623]/40 px-2 py-2 leading-5 text-[#F5A623]">VOID_TIMEOUT — appeal never completed. All stakes refundable; disputer bond returned.</div>
       )}
       {hasPos && pos && (
         <div className="border border-[#1C2620] px-2 py-2 leading-5">
           <div className="text-[9px] tracking-[0.18em] text-[#8B9A92]">YOUR POSITION</div>
           <div className="flex justify-between"><span className="text-[#00FF9A]">YES {pts(pos.yes)}</span><span className="text-[#FF4D4D]">NO {pts(pos.no)}</span></div>
           {pos.claimed && <div className="text-[#8B9A92]">CLAIMED {pts(pos.payout)} pts</div>}
-          {(m.status === "FINALIZED" || (m.status === "PROPOSED" && windowLeft <= 0)) && !pos.claimed && (
-            <button className="pp-btn mt-2 w-full" disabled={tx.busy} onClick={() => tx.run("claim", [m.id])}>[CLAIM {m.status === "FINALIZED" ? pts(pos.claimable) + " PTS" : "PAYOUT"}]</button>
+          {(m.status === "FINALIZED" || m.status === "VOID_TIMEOUT" || (m.status === "PROPOSED" && windowLeft <= 0)) && !pos.claimed && (
+            <button className="pp-btn mt-2 w-full" disabled={tx.busy} onClick={() => tx.run("claim", [m.id])}>[CLAIM {m.status !== "PROPOSED" ? pts(pos.claimable) + " PTS" : "PAYOUT"}]</button>
           )}
         </div>
       )}
@@ -204,12 +218,13 @@ export function MarketDetail({ id, onBack }: { id: number; onBack: () => void })
           <OddsBar yesPct={m.yes_pct} wide />
           <span className="whitespace-nowrap text-[#FF4D4D]">{pts(m.no_total)} · NO {100 - m.yes_pct}%</span>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-px bg-[#1C2620] font-mono text-[10px] sm:grid-cols-5">
+        <div className="mt-3 grid grid-cols-2 gap-px bg-[#1C2620] font-mono text-[10px] sm:grid-cols-6">
           {[
             ["POOL", pts(m.pool)],
             ["STAKERS", m.stakers],
             ["DEADLINE", utc(m.deadline)],
             ["DISPUTE WINDOW", countdown(m.dispute_window)],
+            ["DISPUTE TIMEOUT", countdown(m.dispute_timeout)],
             ["CREATOR", shortAddress(m.creator)],
           ].map(([k, v]) => (
             <div key={k as string} className="bg-[#0F1612] px-2 py-1.5"><div className="text-[#8B9A92]">{k}</div><div className="text-[#D7E0DA]">{v}</div></div>

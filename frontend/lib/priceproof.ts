@@ -5,7 +5,7 @@ import type { TransactionHash } from "genlayer-js/types";
 import { CONTRACT_ADDRESS, RPC_URL } from "./config";
 import type { EthereumProvider } from "./wallet";
 
-export type MarketStatus = "OPEN" | "CLOSED" | "PROPOSED" | "DISPUTED" | "FINALIZED" | "INVALID";
+export type MarketStatus = "OPEN" | "CLOSED" | "PROPOSED" | "DISPUTED" | "FINALIZED" | "INVALID" | "VOID_TIMEOUT";
 export type Outcome = "" | "YES" | "NO" | "UNRESOLVABLE";
 
 export interface Market {
@@ -34,14 +34,17 @@ export interface Market {
   disputer: string;
   dispute_reason: string;
   dispute_source: string;
-  dispute_result: "" | "FLIPPED" | "UPHELD";
+  dispute_result: "" | "FLIPPED" | "UPHELD" | "TIMEOUT";
+  dispute_timeout: number;
+  disputed_at: number;
+  timeout_at: number;
   slashed: number;
   rounds: number;
 }
 
 export interface EvidenceRound {
-  kind: "INITIAL" | "APPEAL";
-  outcome: Outcome;
+  kind: "INITIAL" | "APPEAL" | "TIMEOUT";
+  outcome: Outcome | "VOID";
   evidence_quote: string;
   source_url: string;
   reasoning: string;

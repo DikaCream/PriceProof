@@ -30,6 +30,7 @@ export const CreateMarket = forwardRef<CreateHandle, { onCreated: (id: number) =
   const [cat, setCat] = useState("SPORTS");
   const [mins, setMins] = useState("60");
   const [win, setWin] = useState("60");
+  const [tmo, setTmo] = useState("1440");
   const tx = useTx();
   const [result, setResult] = useState<{ status: string; reason: string; id: number } | null>(null);
 
@@ -44,8 +45,10 @@ export const CreateMarket = forwardRef<CreateHandle, { onCreated: (id: number) =
     if (m < 2) c.push({ level: "err", msg: "deadline must be ≥ 2 min out" });
     const w = parseInt(win || "0", 10);
     if (w < 1 || w > 10080) c.push({ level: "err", msg: "dispute window 1 min – 7 days" });
+    const t = parseInt(tmo || "0", 10);
+    if (t < 1 || t > 10080) c.push({ level: "err", msg: "dispute timeout 1 min – 7 days" });
     return c;
-  }, [q, crit, srcs.length, dup, mins, win]);
+  }, [q, crit, srcs.length, dup, mins, win, tmo]);
   const empty = !q.trim() && !crit.trim() && !srcs.length;
   const blocked = all.some((c) => c.level === "err") || urlChecks.some((c) => c?.level === "err");
   const score = empty ? "AWAITING INPUT" : blocked ? "BLOCKED" : all.some((c) => c.level === "warn") || urlChecks.some((c) => c?.level === "warn") ? "AT RISK" : "LIKELY VALID";
@@ -53,7 +56,7 @@ export const CreateMarket = forwardRef<CreateHandle, { onCreated: (id: number) =
   async function submit() {
     setResult(null);
     const deadline = Math.floor(Date.now() / 1000) + parseInt(mins, 10) * 60;
-    const res = await tx.run("create_market", [q.trim(), crit.trim(), srcs, deadline, cat, parseInt(win, 10) * 60]);
+    const res = await tx.run("create_market", [q.trim(), crit.trim(), srcs, deadline, cat, parseInt(win, 10) * 60, parseInt(tmo, 10) * 60]);
     if (res) {
       const v = res.values as Record<string, unknown>;
       const r = { status: String(v.status ?? ""), reason: String(v.invalid_reason ?? ""), id: Number(v.id ?? -1) };
@@ -82,7 +85,7 @@ export const CreateMarket = forwardRef<CreateHandle, { onCreated: (id: number) =
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <label className="font-mono text-[10px] text-[#8B9A92]">CATEGORY
             <select className="pp-select mt-1 w-full" value={cat} onChange={(e) => setCat(e.target.value)}>
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
@@ -93,6 +96,9 @@ export const CreateMarket = forwardRef<CreateHandle, { onCreated: (id: number) =
           </label>
           <label className="font-mono text-[10px] text-[#8B9A92]">DISPUTE (MIN)
             <input className="pp-input mt-1" inputMode="numeric" value={win} onChange={(e) => setWin(e.target.value.replace(/\D/g, ""))} />
+          </label>
+          <label className="font-mono text-[10px] text-[#8B9A92]">TIMEOUT (MIN)
+            <input className="pp-input mt-1" inputMode="numeric" value={tmo} onChange={(e) => setTmo(e.target.value.replace(/\D/g, ""))} />
           </label>
         </div>
         <div className="border border-[#1C2620] bg-[#070B09] px-2 py-1.5">
