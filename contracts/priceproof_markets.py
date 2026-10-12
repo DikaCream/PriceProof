@@ -18,6 +18,9 @@ MAX_DEADLINE_S = 366 * 86400
 MIN_WINDOW_S = 60
 MAX_WINDOW_S = 7 * 86400
 DEFAULT_WINDOW_S = 3600
+DEFAULT_DISPUTE_TIMEOUT_S = 86400
+MIN_TIMEOUT_S = 60
+MAX_TIMEOUT_S = 7 * 86400
 PAGE_CHARS = 12000
 QUOTE_MAX = 400
 MAX_PAGE = 50
@@ -202,7 +205,7 @@ class Market:
     created_at: u256
     deadline: u256
     window: u256
-    status: str  # OPEN | INVALID | PROPOSED | DISPUTED | FINALIZED (CLOSED is derived)
+    status: str  # OPEN | INVALID | PROPOSED | DISPUTED | FINALIZED | VOID_TIMEOUT (CLOSED is derived)
     invalid_reason: str
     yes_total: u256
     no_total: u256
@@ -215,12 +218,14 @@ class Market:
     dispute_source: str
     dispute_result: str  # "" | FLIPPED | UPHELD
     slashed: u256
+    timeout: u256
+    disputed_at: u256
 
 
 @allow_storage
 @dataclass
 class Round:
-    kind: str  # INITIAL | APPEAL
+    kind: str  # INITIAL | APPEAL | TIMEOUT
     outcome: str
     quote: str
     source_url: str
@@ -309,13 +314,15 @@ class PriceProofMarkets(gl.Contract):
             "dispute_open": m.status == "PROPOSED" and now < ends, "finalized_at": int(m.finalized_at),
             "disputer": m.disputer.as_hex if m.disputer != ZERO else "", "dispute_reason": m.dispute_reason,
             "dispute_source": m.dispute_source, "dispute_result": m.dispute_result, "slashed": int(m.slashed),
+            "dispute_timeout": int(m.timeout), "disputed_at": int(m.disputed_at),
+            "timeout_at": int(m.disputed_at) + int(m.timeout) if int(m.disputed_at) > 0 else 0,
             "rounds": len(self.rounds.get(str(int(m.id)), [])),
         }
 
     def _payout(self, m: Market, p: Position) -> int:
         yes, no = int(p.yes), int(p.no)
         wy, wn = int(m.yes_total), int(m.no_total)
-        if m.outcome == "UNRESOLVABLE":
+        if m.status == "VOID_TIMEOUT" or m.outcome == "UNRESOLVABLE":
             return yes + no
         winners = wy if m.outcome == "YES" else wn
         if winners == 0:  # nobody backed the winning side -> refund everyone
@@ -336,7 +343,8 @@ class PriceProofMarkets(gl.Contract):
     # ------------------------------------------------------------ markets
     @gl.public.write
     def create_market(self, question: str, resolution_criteria: str, source_urls: list, deadline_ts: int,
-                      category: str, dispute_window_s: int) -> dict:
+                      category: str, dispute_window_s: int,
+                      dispute_timeout_s: int) -> dict:
         q = " ".join(question.split())
         crit = " ".join(resolution_criteria.split())
         cat = category.strip().upper()
@@ -361,6 +369,9 @@ class PriceProofMarkets(gl.Contract):
         win = int(dispute_window_s)
         if win < MIN_WINDOW_S or win > MAX_WINDOW_S:
             raise gl.vm.UserError("Dispute window must be 60s to 7 days")
+        tmo = int(dispute_timeout_s)
+        if tmo < MIN_TIMEOUT_S or tmo > MAX_TIMEOUT_S:
+            raise gl.vm.UserError("Dispute timeout must be 60s to 7 days")
         verdict = run_validity(q, crit, srcs, dl)
         mid = len(self.markets)
         self.markets.append(Market(
@@ -370,7 +381,7 @@ class PriceProofMarkets(gl.Contract):
             invalid_reason="" if verdict["valid"] else (verdict["reason"] or "Rejected by validity check"),
             yes_total=u256(0), no_total=u256(0), stakers=u256(0), outcome="", proposed_at=u256(0),
             finalized_at=u256(0), disputer=ZERO, dispute_reason="", dispute_source="", dispute_result="",
-            slashed=u256(0),
+            slashed=u256(0), timeout=u256(tmo), disputed_at=u256(0),
         ))
         return self._market_view(self.markets[mid])
 
@@ -438,6 +449,7 @@ class PriceProofMarkets(gl.Contract):
         m.disputer = who
         m.dispute_reason = r
         m.dispute_source = extra
+        m.disputed_at = u256(_now())
         self.total_disputes = u256(int(self.total_disputes) + 1)
         return self._market_view(m)
 
@@ -470,6 +482,25 @@ class PriceProofMarkets(gl.Contract):
         return self._market_view(m)
 
     @gl.public.write
+    def expire_dispute(self, market_id: int) -> dict:
+        """If the appeal round never reached consensus, void the market after the timeout."""
+        m = self._m(market_id)
+        if m.status != "DISPUTED":
+            raise gl.vm.UserError("Market is not disputed")
+        if _now() < int(m.disputed_at) + int(m.timeout):
+            raise gl.vm.UserError("Dispute timeout not reached")
+        m.status = "VOID_TIMEOUT"
+        m.dispute_result = "TIMEOUT"
+        m.finalized_at = u256(_now())
+        self._set_bal(m.disputer, self._bal(m.disputer) + DISPUTE_BOND)  # bond returned in full
+        self.rounds.get_or_insert_default(str(market_id)).append(Round(
+            kind="TIMEOUT", outcome="VOID", quote="", source_url="",
+            reasoning="Appeal round did not complete within " + str(int(m.timeout)) +
+                      "s of the dispute; market voided, all stakes refundable, dispute bond returned.",
+            sources="", caller=gl.message.sender_address, timestamp=u256(_now())))
+        return self._market_view(m)
+
+    @gl.public.write
     def finalize(self, market_id: int) -> dict:
         m = self._m(market_id)
         if m.status != "PROPOSED":
@@ -484,7 +515,7 @@ class PriceProofMarkets(gl.Contract):
         m = self._m(market_id)
         if m.status == "PROPOSED" and _now() >= int(m.proposed_at) + int(m.window):
             self._finalize(m)
-        if m.status != "FINALIZED":
+        if m.status not in ("FINALIZED", "VOID_TIMEOUT"):
             raise gl.vm.UserError("Market is not finalized")
         who = gl.message.sender_address
         key = self._pkey(market_id, who)
@@ -540,7 +571,7 @@ class PriceProofMarkets(gl.Contract):
         p = self.positions.get(self._pkey(market_id, Address(user)), None)
         if p is None:
             return {"market_id": market_id, "yes": 0, "no": 0, "claimed": False, "payout": 0, "claimable": 0}
-        claimable = self._payout(m, p) if m.status == "FINALIZED" and not p.claimed else 0
+        claimable = self._payout(m, p) if m.status in ("FINALIZED", "VOID_TIMEOUT") and not p.claimed else 0
         return {"market_id": market_id, "yes": int(p.yes), "no": int(p.no), "claimed": p.claimed,
                 "payout": int(p.payout), "claimable": claimable}
 
@@ -562,7 +593,7 @@ class PriceProofMarkets(gl.Contract):
 
     @gl.public.view
     def get_stats(self) -> dict:
-        counts = {"OPEN": 0, "CLOSED": 0, "PROPOSED": 0, "DISPUTED": 0, "FINALIZED": 0, "INVALID": 0}
+        counts = {"OPEN": 0, "CLOSED": 0, "PROPOSED": 0, "DISPUTED": 0, "FINALIZED": 0, "INVALID": 0, "VOID_TIMEOUT": 0}
         for m in self.markets:
             counts[self._status(m)] += 1
         return {"markets": len(self.markets), "by_status": counts, "users": len(self.users),
@@ -572,7 +603,8 @@ class PriceProofMarkets(gl.Contract):
     @gl.public.view
     def get_config(self) -> dict:
         return {"start_points": START_POINTS, "min_stake": MIN_STAKE, "dispute_bond": DISPUTE_BOND,
-                "dispute_reward": DISPUTE_REWARD, "max_sources": MAX_SOURCES, "default_window_s": DEFAULT_WINDOW_S,
+                "dispute_reward": DISPUTE_REWARD, "max_sources": MAX_SOURCES, "default_window_s": DEFAULT_WINDOW_S, "default_dispute_timeout_s": DEFAULT_DISPUTE_TIMEOUT_S,
+                "min_timeout_s": MIN_TIMEOUT_S, "max_timeout_s": MAX_TIMEOUT_S,
                 "min_window_s": MIN_WINDOW_S, "max_window_s": MAX_WINDOW_S, "min_deadline_s": MIN_DEADLINE_S,
                 "categories": list(CATEGORIES), "blocked_domains": list(BLOCKED_DOMAINS),
                 "reputable_domains": list(REPUTABLE_DOMAINS), "strict_domains": self.strict_domains,
