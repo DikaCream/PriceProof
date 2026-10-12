@@ -11,9 +11,10 @@ export const SITE_URL =
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
   "https://priceproof.vercel.app";
 
-export const MAX_NOTE_LENGTH = 140;
-export const HISTORY_POINTS = 24;
-export const TOLERANCE_PCT = 1.5;
+
+
+export const START_POINTS = 1000;
+export const DISPUTE_BOND = 100;
 
 export const txExplorerUrl = (hash: string) => `${EXPLORER_URL}/transactions/${hash}`;
 export const addressExplorerUrl = (address: string) => `${EXPLORER_URL}/address/${address}`;

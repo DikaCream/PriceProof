@@ -3,6 +3,6 @@ import { readFileSync } from "node:fs";
 import { getClient } from "./lib.mjs";
 
 const client = getClient({ withAccount: false });
-const code = readFileSync(new URL("../contracts/price_proof.py", import.meta.url), "utf8");
+const code = readFileSync(new URL("../contracts/priceproof_markets.py", import.meta.url), "utf8");
 const schema = await client.getContractSchemaForCode(code);
 console.log(JSON.stringify(schema, (_, v) => (typeof v === "bigint" ? v.toString() : v), 2));
