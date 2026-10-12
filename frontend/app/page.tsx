@@ -1,6 +1,6 @@
 import { Header } from "@/components/Header";
 import { TickerStrip } from "@/components/TickerStrip";
-import { TerminalApp } from "@/components/TerminalApp";
+import { MarketsApp } from "@/components/MarketsApp";
 import { addressExplorerUrl, CHAIN_NAME, CONTRACT_ADDRESS } from "@/lib/config";
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
       <TickerStrip />
       <Header />
       <main className="mx-auto max-w-[1400px] px-3 pb-12 pt-4 sm:px-4">
-        <TerminalApp />
+        <MarketsApp />
       </main>
       <footer className="border-t border-[#1C2620] bg-[#0F1612] py-4 text-center font-mono text-[10px] tracking-wide text-[#8B9A92]">
         PRICEPROOF // {CHAIN_NAME.toUpperCase()}
