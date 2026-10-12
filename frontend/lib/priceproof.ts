@@ -5,56 +5,83 @@ import type { TransactionHash } from "genlayer-js/types";
 import { CONTRACT_ADDRESS, RPC_URL } from "./config";
 import type { EthereumProvider } from "./wallet";
 
-export interface AssetPrice {
-  symbol: string;
-  name: string;
-  price_e8: number;
-  price: string;
-  updated_at: number;
-  updater: string;
-  source: string;
-  updates: number;
-  active_alerts: number;
-}
+export type MarketStatus = "OPEN" | "CLOSED" | "PROPOSED" | "DISPUTED" | "FINALIZED" | "INVALID";
+export type Outcome = "" | "YES" | "NO" | "UNRESOLVABLE";
 
-export interface PricePoint {
-  price_e8: number;
-  price: string;
-  timestamp: number;
-  updater: string;
-  source: string;
-}
-
-export interface PriceAlert {
+export interface Market {
   id: number;
-  owner: string;
-  symbol: string;
-  target_e8: number;
-  target: string;
-  direction: "above" | "below";
-  note: string;
+  creator: string;
+  question: string;
+  criteria: string;
+  sources: string[];
+  trusted_sources: boolean[];
+  category: string;
   created_at: number;
-  price_at_creation_e8: number;
-  status: "active" | "triggered" | "cancelled";
-  triggered_price_e8: number;
-  triggered_price: string;
-  triggered_at: number;
-  triggered_by: "" | "create" | "update" | "check";
+  deadline: number;
+  dispute_window: number;
+  status: MarketStatus;
+  invalid_reason: string;
+  yes_total: number;
+  no_total: number;
+  pool: number;
+  stakers: number;
+  yes_pct: number;
+  outcome: Outcome;
+  proposed_at: number;
+  dispute_ends: number;
+  dispute_open: boolean;
+  finalized_at: number;
+  disputer: string;
+  dispute_reason: string;
+  dispute_source: string;
+  dispute_result: "" | "FLIPPED" | "UPHELD";
+  slashed: number;
+  rounds: number;
 }
 
-export interface OracleStats {
-  assets: number;
-  updates: number;
-  alerts: number;
-  active: number;
-  triggered: number;
-  cancelled: number;
-  updaters: number;
+export interface EvidenceRound {
+  kind: "INITIAL" | "APPEAL";
+  outcome: Outcome;
+  evidence_quote: string;
+  source_url: string;
+  reasoning: string;
+  sources: string[];
+  caller: string;
+  timestamp: number;
 }
 
-export interface UpdaterRow {
+export interface Position {
+  market_id: number;
+  yes: number;
+  no: number;
+  claimed: boolean;
+  payout: number;
+  claimable: number;
+  question?: string;
+  status?: MarketStatus;
+  outcome?: Outcome;
+}
+
+export interface UserInfo {
   address: string;
-  updates: number;
+  balance: number;
+  claimed_start: boolean;
+  positions: Position[];
+}
+
+export interface Stats {
+  markets: number;
+  by_status: Record<MarketStatus, number>;
+  users: number;
+  total_staked: number;
+  disputes: number;
+  flipped: number;
+}
+
+export interface LeaderRow {
+  address: string;
+  points: number;
+  markets: number;
 }
 
 // genlayer-js decodes contract dicts as Map and ints as bigint; normalize to plain JSON values.
@@ -86,12 +113,14 @@ async function read<T>(functionName: string, args: any[] = []): Promise<T> {
   return toPlain(result) as T;
 }
 
-export const getAllPrices = () => read<AssetPrice[]>("get_all_prices");
-export const getHistory = (symbol: string, limit: number) => read<PricePoint[]>("get_history", [symbol, limit]);
-export const getAlerts = (offset: number, limit: number) => read<PriceAlert[]>("get_alerts", [offset, limit]);
-export const getAlertsByOwner = (owner: string) => read<PriceAlert[]>("get_alerts_by_owner", [owner]);
-export const getStats = () => read<OracleStats>("get_stats");
-export const getTopUpdaters = (limit: number) => read<UpdaterRow[]>("get_top_updaters", [limit]);
+export const getMarkets = (status: string, offset: number, limit: number) =>
+  read<{ total: number; items: Market[] }>("get_markets", [status, offset, limit]);
+export const getMarket = (id: number) => read<Market>("get_market", [id]);
+export const getEvidence = (id: number) => read<EvidenceRound[]>("get_evidence", [id]);
+export const getPosition = (id: number, user: string) => read<Position>("get_position", [id, user]);
+export const getUser = (user: string) => read<UserInfo>("get_user", [user]);
+export const getLeaderboard = (limit: number) => read<LeaderRow[]>("get_leaderboard", [limit]);
+export const getStats = () => read<Stats>("get_stats");
 
 // ------------------------------------------------------------------ transactions
 
@@ -131,8 +160,6 @@ export function parseReadable(readable: unknown): Record<string, unknown> {
       out[m[1]] = raw.slice(1, -1);
     }
   }
-  const triggered = readable.match(/"triggered"\s*:\s*\[([^\]]*)\]/);
-  if (triggered) out.triggered = triggered[1].split(/[,\s]+/).filter(Boolean).map(Number);
   return out;
 }
 

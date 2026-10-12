@@ -10,31 +10,32 @@ export function timeAgo(unixSeconds: number): string {
   if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 86400 * 30) return `${Math.floor(diff / 86400)}d ago`;
-  return new Date(unixSeconds * 1000).toLocaleDateString();
+  return `${Math.floor(diff / 86400)}d ago`;
 }
 
-/** fresh: < 15 min, aging: < 2 h, stale: older or never verified. */
-export function freshness(unixSeconds: number): "fresh" | "aging" | "stale" {
-  if (!unixSeconds) return "stale";
-  const diff = Date.now() / 1000 - unixSeconds;
-  return diff < 900 ? "fresh" : diff < 7200 ? "aging" : "stale";
+/** Compact countdown: 2d 04h, 03:12:09, 04:59. */
+export function countdown(seconds: number): string {
+  if (seconds <= 0) return "00:00";
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const p = (n: number) => String(n).padStart(2, "0");
+  if (d > 0) return `${d}d ${p(h)}h`;
+  return h > 0 ? `${p(h)}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
 }
 
-/** Formats a 1e8 fixed-point USD price. */
-export function usd(priceE8: number): string {
-  const v = priceE8 / 1e8;
-  if (!v) return "-";
-  const digits = v >= 1000 ? 2 : v >= 1 ? 3 : v >= 0.01 ? 5 : 8;
-  return v.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: v >= 1000 ? 2 : 2,
-    maximumFractionDigits: digits,
-  });
+export function utc(unixSeconds: number): string {
+  if (!unixSeconds) return "—";
+  return new Date(unixSeconds * 1000).toISOString().replace("T", " ").slice(0, 16) + "Z";
 }
 
-export function pctChange(from: number, to: number): number | null {
-  if (!from || !to) return null;
-  return ((to - from) / from) * 100;
+export const pts = (n: number) => n.toLocaleString("en-US");
+
+export function host(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }

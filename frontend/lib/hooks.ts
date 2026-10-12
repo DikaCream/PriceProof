@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CONTRACT_ADDRESS, HISTORY_POINTS } from "./config";
+import { CONTRACT_ADDRESS } from "./config";
 import {
-  getAlerts,
-  getAlertsByOwner,
-  getAllPrices,
-  getHistory,
+  getEvidence,
+  getLeaderboard,
+  getMarket,
+  getMarkets,
+  getPosition,
   getStats,
-  getTopUpdaters,
+  getUser,
   sendTx,
   TxError,
   type TxResult,
@@ -19,31 +20,35 @@ import { useWallet } from "./WalletProvider";
 
 const enabled = !!CONTRACT_ADDRESS;
 
-export const usePrices = () =>
-  useQuery({ queryKey: ["pp", "prices"], queryFn: getAllPrices, enabled, refetchInterval: 15_000 });
+export const useMarkets = (status: string) =>
+  useQuery({ queryKey: ["pp", "markets", status], queryFn: () => getMarkets(status, 0, 50), enabled, refetchInterval: 15_000 });
 
-export const useHistory = (symbol: string) =>
-  useQuery({
-    queryKey: ["pp", "history", symbol],
-    queryFn: () => getHistory(symbol, HISTORY_POINTS),
-    enabled,
-    refetchInterval: 30_000,
-  });
+export const useMarket = (id: number | null) =>
+  useQuery({ queryKey: ["pp", "market", id], queryFn: () => getMarket(id as number), enabled: enabled && id !== null, refetchInterval: 10_000 });
 
-export const useAlerts = () =>
-  useQuery({ queryKey: ["pp", "alerts"], queryFn: () => getAlerts(0, 50), enabled, refetchInterval: 15_000 });
+export const useEvidence = (id: number | null, rounds: number) =>
+  useQuery({ queryKey: ["pp", "evidence", id, rounds], queryFn: () => getEvidence(id as number), enabled: enabled && id !== null && rounds > 0 });
 
-export const useMyAlerts = (owner: string | null) =>
-  useQuery({
-    queryKey: ["pp", "alerts", "owner", owner],
-    queryFn: () => getAlertsByOwner(owner as string),
-    enabled: enabled && !!owner,
-  });
+export const usePosition = (id: number | null, user: string | null) =>
+  useQuery({ queryKey: ["pp", "pos", id, user], queryFn: () => getPosition(id as number, user as string), enabled: enabled && id !== null && !!user });
+
+export const useUser = (user: string | null) =>
+  useQuery({ queryKey: ["pp", "user", user], queryFn: () => getUser(user as string), enabled: enabled && !!user, refetchInterval: 20_000 });
 
 export const useStats = () => useQuery({ queryKey: ["pp", "stats"], queryFn: getStats, enabled, refetchInterval: 15_000 });
 
-export const useTopUpdaters = () =>
-  useQuery({ queryKey: ["pp", "top"], queryFn: () => getTopUpdaters(10), enabled, refetchInterval: 30_000 });
+export const useLeaderboard = () =>
+  useQuery({ queryKey: ["pp", "leaders"], queryFn: () => getLeaderboard(10), enabled, refetchInterval: 30_000 });
+
+/** Re-renders every `ms` so countdowns stay live. */
+export function useNow(ms = 1000): number {
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+  useEffect(() => {
+    const id = setInterval(() => setNow(Math.floor(Date.now() / 1000)), ms);
+    return () => clearInterval(id);
+  }, [ms]);
+  return now;
+}
 
 /** Runs one contract write with live consensus status; refreshes all queries afterwards. */
 export function useTx() {
