@@ -8,7 +8,7 @@ A creator freezes a YES/NO question, natural-language resolution criteria and 1�
 |---|---|
 | Live app | https://priceproof-eta.vercel.app |
 | Network | GenLayer Studionet (chain `61999`, RPC `https://studio.genlayer.com/api`) |
-| Contract | [`0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3`](https://explorer-studio.genlayer.com/address/0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3) (`contracts/priceproof_markets.py`) |
+| Contract | [`0x0e362036Aed7836F6C4Fc2220dFd20B6CbB7E06B`](https://explorer-studio.genlayer.com/address/0x0e362036Aed7836F6C4Fc2220dFd20B6CbB7E06B) (`contracts/priceproof_markets.py`) |
 | Real e2e | [`deployments/e2e-studionet.json`](deployments/e2e-studionet.json) |
 | Trust model | [`docs/TRUST_MODEL.md`](docs/TRUST_MODEL.md) |
 
@@ -27,8 +27,8 @@ create_market ──AI validity check──▶ OPEN ──deadline──▶ CLOS
                                                        │ no dispute             │ dispute(bond)
                                                        ▼                        ▼
                                                   FINALIZED ◀──resolve_dispute()── DISPUTED
-                                                       │
-                                                    claim()
+                                                       │                          │ timeout passed
+                                                    claim()   ◀── refunds ── VOID_TIMEOUT (expire_dispute)
 ```
 
 ## Trust Model
@@ -46,9 +46,9 @@ Full write-up in [docs/TRUST_MODEL.md](docs/TRUST_MODEL.md). Summary:
 
 **Evidence.** Every round (initial and appeal) is stored on-chain: outcome, verbatim quote, cited URL, reasoning, sources read, caller, timestamp (`get_evidence`). The UI renders it as a terminal log.
 
-**Dispute window and bonds.** Each market sets its window (60 s – 7 days, default 1 h). Any staker can `dispute(id, reason, extra_source_url?)` by bonding **100 points**. `resolve_dispute` runs a stricter **appeal round** over the original sources plus the extra one, with the dispute reason and prior evidence in the prompt, under the same consensus rules. **Flipped** → bond back + 100 reward. **Upheld** → bond slashed into the winners' pool. One dispute per market, then FINALIZED.
+**Dispute window and bonds.** Each market sets its window (60 s – 7 days, default 1 h). Any staker can `dispute(id, reason, extra_source_url?)` by bonding **100 points**. `resolve_dispute` runs a stricter **appeal round** over the original sources plus the extra one, with the dispute reason and prior evidence in the prompt, under the same consensus rules. **Flipped** → bond back + 100 reward. **Upheld** → bond slashed into the winners' pool. One dispute per market, then FINALIZED. **Dispute timeout:** each market sets a timeout at creation (60 s – 7 days, UI default 24 h). If it is still DISPUTED after that, anyone calls `expire_dispute(id)`, and the market becomes `VOID_TIMEOUT`: all stakes are refundable via `claim`, the disputer's bond is returned in full, and a TIMEOUT entry is added to the evidence trail. A market can never be stuck.
 
-**Failure modes.** Edited or vandalised source pages (mitigated by quote-on-page checks, multiple sources, disputes), prompt injection in pages (pinned prompt, label consensus across independent validators), LLM disagreement (tx fails, anyone retries; ambiguity resolves to refund rather than a coin flip), unavailable pages (UNRESOLVABLE refund). See the table in TRUST_MODEL.md.
+**Failure modes.** Edited or vandalised source pages (mitigated by quote-on-page checks, multiple sources, disputes), prompt injection in pages (pinned prompt, label consensus across independent validators), LLM disagreement (tx fails, anyone retries; ambiguity resolves to refund rather than a coin flip; an appeal that never reaches consensus is voided by the dispute timeout), unavailable pages (UNRESOLVABLE refund). See the table in TRUST_MODEL.md.
 
 **What GenLayer uniquely enables vs Chainlink / UMA.** Chainlink feeds serve pre-configured numeric data through operator networks, so there is no feed for long-tail natural-language events. UMA's optimistic oracle handles arbitrary questions but relies on human proposers and a multi-day token-holder vote. On GenLayer the contract tells validators *what to read and how to judge it*. Each validator independently browses and reasons, consensus is reached on meaning (the equivalence principle), resolution takes seconds, and the evidence trail lives on-chain.
 
@@ -57,20 +57,21 @@ Full write-up in [docs/TRUST_MODEL.md](docs/TRUST_MODEL.md). Summary:
 | Method | Kind | Notes |
 |---|---|---|
 | `claim_points()` | write | 1000 starting points, once per wallet |
-| `create_market(question, resolution_criteria, source_urls[1-3], deadline_ts, category, dispute_window_s)` | write (nondet) | deterministic rules + AI validity check → `OPEN` or `INVALID` |
+| `create_market(question, resolution_criteria, source_urls[1-3], deadline_ts, category, dispute_window_s, dispute_timeout_s)` | write (nondet) | deterministic rules + AI validity check → `OPEN` or `INVALID` |
 | `stake(id, "YES"\|"NO", amount)` | write | min 10 points, before the deadline |
 | `resolve(id)` | write (nondet) | after the deadline → `PROPOSED` + evidence round |
 | `dispute(id, reason, extra_source_url)` | write | stakers only, inside the window, 100-point bond |
 | `resolve_dispute(id)` | write (nondet) | appeal round → `FINALIZED` (FLIPPED / UPHELD) |
-| `finalize(id)` / `claim(id)` | write | after the window; `claim` auto-finalizes |
-| `get_markets(status, offset, limit)` | view | newest first, status `ALL/OPEN/CLOSED/PROPOSED/DISPUTED/FINALIZED/INVALID` |
+| `expire_dispute(id)` | write | DISPUTED and timeout passed → `VOID_TIMEOUT`, refunds + bond back |
+| `finalize(id)` / `claim(id)` | write | after the window; `claim` auto-finalizes; refunds on VOID_TIMEOUT |
+| `get_markets(status, offset, limit)` | view | newest first, status `ALL/OPEN/CLOSED/PROPOSED/DISPUTED/FINALIZED/INVALID/VOID_TIMEOUT` |
 | `get_market(id)`, `get_evidence(id)` | view | detail + all resolution rounds |
 | `get_position(id, user)`, `get_user(user)` | view | positions, balance, claimable |
 | `get_leaderboard(limit)`, `get_stats()`, `get_config()` | view | |
 
 ## Real end-to-end run on Studionet
 
-`npm run e2e:studionet` uses two wallets (deployer + a throwaway `PRIVATE_KEY_2`). Results are in [`deployments/e2e-studionet.json`](deployments/e2e-studionet.json):
+Full lifecycle run (recorded under `previousContract` in the JSON; it ran on the contract before the timeout feature, `0xb0348dC3…C1f3`). `npm run e2e:studionet` uses two wallets (deployer + a throwaway `PRIVATE_KEY_2`). Results are in [`deployments/e2e-studionet.json`](deployments/e2e-studionet.json):
 
 | # | Step | Wallet | Result | Tx |
 |---|---|---|---|---|
@@ -100,9 +101,34 @@ Full write-up in [docs/TRUST_MODEL.md](docs/TRUST_MODEL.md). Summary:
 - **M2** "Did Croatia win the 2018 FIFA World Cup final?" → **NO**, quote: "The final score was 4–2 to France.". No dispute → `finalize` after the 60 s window. Payouts: A 0 / B 500.
 - Final balances: A 1000 pts, B 1000 pts.
 
+### Dispute-timeout run (current contract)
+
+`npm run e2e:timeout`: the appeal round is intentionally never run.
+
+| # | Step | Wallet | Result | Tx |
+|---|---|---|---|---|
+| 1 | claim starting points (A) | A | ✅ ACCEPTED | [0x68926484…](https://explorer-studio.genlayer.com/transactions/0x68926484c82b22341cefec57131ef66f8ba0409d94e4a65e887496ff3b9e8b17) |
+| 2 | claim starting points (B) | B | ✅ ACCEPTED | [0xb8ffc8e7…](https://explorer-studio.genlayer.com/transactions/0xb8ffc8e7427c24e7e0ffc4ae0ef1105c93b4b27cfc6f1694b84092fbeab5d9e6) |
+| 3 | create T (timeout path; window 300s, timeout 60s) | A | ✅ ACCEPTED | [0x8870dce1…](https://explorer-studio.genlayer.com/transactions/0x8870dce1962c15f6c48fc83debfc0ac45307b2819a31915987a6368f4fcef87a) |
+| 4 | create S (sanity resolve) | A | ✅ ACCEPTED | [0x58011d71…](https://explorer-studio.genlayer.com/transactions/0x58011d71f66e9b1be4afc0871ff5661c26de5c0bb3f6186daa064caab9f57f7b) |
+| 5 | stake YES 300 on T | A | ✅ ACCEPTED | [0x64c00242…](https://explorer-studio.genlayer.com/transactions/0x64c0024291b621808f31ee0c88b3ffa53aa12bfae9488456af8fab620545205b) |
+| 6 | stake NO 200 on T | B | ✅ ACCEPTED | [0xc7b57fb6…](https://explorer-studio.genlayer.com/transactions/0xc7b57fb6355e5de040eab64dd741b3d2d5e48ab499d3ef0ed9364dccbd974719) |
+| 7 | resolve T | A | ✅ ACCEPTED | [0xb89b340b…](https://explorer-studio.genlayer.com/transactions/0xb89b340b82b7501508b282bede91e6a4a729c85f78e312b1a39e866e2211b714) |
+| 8 | resolve S (sanity) | B | ✅ ACCEPTED | [0xd2d6c6b6…](https://explorer-studio.genlayer.com/transactions/0xd2d6c6b6e35a68c36cf51df2ddae03b586ecedd874d27f0d3da1c7fe34095552) |
+| 9 | dispute T by B (bond 100) | B | ✅ ACCEPTED | [0xfc0152e1…](https://explorer-studio.genlayer.com/transactions/0xfc0152e1856453a6961eb60c2a8814424f73b5dc7006537be42c9530d984c6f0) |
+| 10 | expire_dispute T too early (expect revert) | A | ✅ reverted as expected (timeout not reached) | [0xcfdf1c91…](https://explorer-studio.genlayer.com/transactions/0xcfdf1c9137d0068d1ff5b87a9bda5ccf17be5ac66e0dba95a6b311049f08ad7f) |
+| 11 | expire_dispute T after timeout | A | ✅ ACCEPTED | [0xd5947480…](https://explorer-studio.genlayer.com/transactions/0xd5947480807cd90e45344fc029da994534ec8b10e52c8f54082d41f5ec41452e) |
+| 12 | claim refund T (A) | A | ✅ ACCEPTED | [0x7fcd8cd2…](https://explorer-studio.genlayer.com/transactions/0x7fcd8cd2bd0d153defb4afea24ae4869d86de2027ab4fc8a66c53833092d89df) |
+| 13 | claim refund T (B) | B | ✅ FINALIZED | [0x7b0add35…](https://explorer-studio.genlayer.com/transactions/0x7b0add35036a59720f695970ec115cb7f651dcb9b7671655acef610995278656) |
+
+- **T** → `VOID_TIMEOUT` after the 60 s timeout. Evidence: `TIMEOUT` / Appeal round did not complete within 60s of the dispute; market voided, all stakes refundable, dispute bond returned.
+- Disputer B's balance went from 700 to 800 on expiry (bond 100 returned). A was refunded 300 and B 200; final balances A 1000, B 1000.
+- **S** sanity resolve → **NO** ("The final score was 4–2 to France.").
+
+
 ## Frontend
 
-Next.js 16 + Tailwind 4 terminal UI (IBM Plex Mono/Sans, `#070B09` / `#00FF9A` / `#F5A623` / `#FF4D4D`): a markets ticker, status-filtered markets table (stacked on mobile), market detail with an order-entry stake form, resolution evidence log, dispute form with live countdown, create-market form with live validity feedback, portfolio/points and leaderboard. Keys: `1-7` filter, `N` new market, `Esc` back.
+Next.js 16 + Tailwind 4 terminal UI (IBM Plex Mono/Sans, `#070B09` / `#00FF9A` / `#F5A623` / `#FF4D4D`): a markets ticker, status-filtered markets table (stacked on mobile), market detail with an order-entry stake form, resolution evidence log, dispute form with live countdown, create-market form with live validity feedback, portfolio/points and leaderboard. Keys: `1-8` filter, `N` new market, `Esc` back.
 
 Screenshots: `docs/markets-desktop.png`, `docs/markets-mobile.png` (generated locally with headless Chrome).
 

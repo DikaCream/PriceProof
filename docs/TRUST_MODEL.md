@@ -7,8 +7,8 @@ PriceProof is a prediction market where **the oracle is the validator set itself
 | Actor | Can do | Cannot do |
 |---|---|---|
 | Creator (any wallet) | Propose a market: question, criteria, 1–3 sources, deadline, category, dispute window | Edit anything after creation; resolve their own market; pick validators |
-| Staker (any wallet) | Claim 1000 points once, stake YES/NO before the deadline, dispute within the window (bond 100), claim payout | Stake after the deadline; dispute without a position |
-| Anyone | Call `resolve`, `resolve_dispute`, `finalize` when their time comes | Influence the outcome: the caller has no say in what validators conclude |
+| Staker (any wallet) | Claim 1000 points once, stake YES/NO before the deadline, dispute within the window (bond 100), claim payout or refund | Stake after the deadline; dispute without a position |
+| Anyone | Call `resolve`, `resolve_dispute`, `expire_dispute`, `finalize` when their time comes | Influence the outcome: the caller has no say in what validators conclude |
 | Validators | Fetch sources, run their own LLM, accept or reject the leader's result | Use sources that were not declared; accept a quote that is not on the cited page |
 | Owner (deployer) | Toggle `strict_domains` (allowlist-only sources) for **future** markets | Touch existing markets, balances, outcomes or sources |
 
@@ -20,7 +20,7 @@ Deterministic rules (contract code, every node computes the same result):
 - **1–3 source URLs**, `https://` only, ≤300 chars, no whitespace, quotes or credentials, no IP hosts, no `localhost`, no duplicates.
 - **Blocked domains**: URL shorteners (bit.ly, t.co, tinyurl…) and social/user-generated platforms (x.com, twitter, facebook, instagram, tiktok, reddit, telegram, discord, youtube, medium, substack…). They can redirect or be edited by anyone.
 - Optional **strict mode**: only allowlisted reputable domains (Wikipedia, Reuters, AP, BBC, ESPN, FIFA, NASA, CoinGecko…). The UI tags each source `[ALLOWLIST]` or `[AI-VETTED]`.
-- Deadline 60 s – 366 days ahead; dispute window 60 s – 7 days (default 1 h).
+- Deadline 60 s – 366 days ahead; dispute window 60 s – 7 days (default 1 h); dispute timeout 60 s – 7 days (default 24 h).
 - **Immutability**: question, criteria and sources are written once. No function can change them.
 
 AI **validity check** (non-deterministic, consensus on a boolean): the leader's LLM decides `valid: true/false` and gives a reason. Every validator asks its own LLM, and consensus requires the **same boolean**. Rejected markets are stored with status `INVALID` and the reason, so rejections are public and auditable. Staking on them is impossible. The check rejects subjective, vague, non-binary or private-information questions, ambiguous criteria, and non-reputable sources.
@@ -52,6 +52,7 @@ Deterministic tie and failure rules:
 - `resolve_dispute(id)` (callable by anyone) runs a **stricter appeal round**: original sources plus the extra source, and a prompt that includes the proposed outcome, its evidence and the dispute reason. Validators must re-examine every source independently, may not trust the reason without source evidence, and keep the outcome unless the sources clearly support a different label. The same quote-on-page and same-label consensus rules apply.
 - **Flipped**: the disputer gets the bond back plus a 100-point reward, the outcome changes, and the market is FINALIZED.
 - **Upheld**: the bond is slashed into the market pool (paid to the winners), and the market is FINALIZED.
+- **Dispute timeout.** Each market sets `dispute_timeout_s` at creation (60 s – 7 days; the UI defaults to 24 h). If the market is still `DISPUTED` when `disputed_at + timeout` passes, because no appeal round reached consensus, **anyone** may call `expire_dispute(id)`. The market becomes `VOID_TIMEOUT`: every staker can `claim` a full refund of their stake, and the disputer's bond is returned in full (no reward, no slash). A `TIMEOUT` entry is appended to the evidence trail. The call reverts before the timeout, and reverts if the dispute was already resolved (status is no longer `DISPUTED`). Liveness is therefore bounded: no market can be locked forever.
 - With no dispute, after the window anyone can `finalize`, and `claim` auto-finalizes.
 
 Payout (parimutuel, integer, deterministic): `stake_on_winner × (yes_total + no_total + slashed) ÷ winning_total`.
@@ -67,7 +68,8 @@ Payout (parimutuel, integer, deterministic): `stake_on_winner × (yes_total + no
 | LLM non-determinism | Consensus on the label only; ambiguity maps to UNRESOLVABLE (refund), never to a coin flip | Borderline questions may need several resolve attempts |
 | Page unavailable / geo-blocked | Up to 3 sources; all down → UNRESOLVABLE refund | — |
 | Frivolous disputes | 100-point bond, one dispute per market, stakers only | — |
-| Market never resolved | Anyone can call `resolve` (it is gasless on Studionet) | A DISPUTED market whose appeal keeps failing consensus stays DISPUTED until a retry succeeds |
+| Market never resolved | Anyone can call `resolve` (it is gasless on Studionet) | — |
+| Appeal round never reaches consensus | Per-market dispute timeout → `expire_dispute` voids the market (`VOID_TIMEOUT`), refunds all stakes, returns the bond | Stakers get their points back rather than a winner/loser outcome |
 | Owner abuse | Owner can only toggle strict mode for new markets | — |
 
 ## 6. Why this needs GenLayer (vs Chainlink / UMA)
