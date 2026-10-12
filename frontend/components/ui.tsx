@@ -7,13 +7,14 @@ export const STATUS_COLOR: Record<MarketStatus, string> = {
   DISPUTED: "text-[#FF4D4D] border-[#FF4D4D]/40",
   FINALIZED: "text-[#8B9A92] border-[#1C2620]",
   INVALID: "text-[#FF4D4D] border-[#FF4D4D]/30 line-through",
+  VOID_TIMEOUT: "text-[#F5A623] border-[#F5A623]/40",
 };
 
 export function StatusTag({ status }: { status: MarketStatus }) {
   return <span className={`inline-block border px-1.5 py-px font-mono text-[10px] tracking-wider ${STATUS_COLOR[status]}`}>{status}</span>;
 }
 
-export function OutcomeTag({ outcome }: { outcome: Outcome }) {
+export function OutcomeTag({ outcome }: { outcome: Outcome | "VOID" }) {
   if (!outcome) return <span className="text-[#8B9A92]">—</span>;
   const c = outcome === "YES" ? "text-[#00FF9A]" : outcome === "NO" ? "text-[#FF4D4D]" : "text-[#F5A623]";
   return <span className={`font-mono text-[11px] font-semibold ${c}`}>{outcome === "UNRESOLVABLE" ? "UNRES" : outcome}</span>;

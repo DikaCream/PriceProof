@@ -40,7 +40,7 @@ export function MarketsApp() {
         e.preventDefault();
         setOpen(null);
         setTimeout(() => createRef.current?.focus(), 0);
-      } else if (/^[1-7]$/.test(e.key)) {
+      } else if (/^[1-8]$/.test(e.key)) {
         setOpen(null);
         setFilter(FILTERS[parseInt(e.key, 10) - 1]);
       }

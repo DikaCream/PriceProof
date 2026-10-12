@@ -78,7 +78,7 @@ export function Header() {
       <div className="hidden border-t border-[#1C2620] bg-[#070B09] px-3 py-1 font-mono text-[10px] text-[#8B9A92] sm:block sm:px-4">
         <span className="text-[#F5A623]">KEYS</span>
         <span className="mx-2 text-[#1C2620]">|</span>
-        <kbd className="text-[#D7E0DA]">1-7</kbd> filter status
+        <kbd className="text-[#D7E0DA]">1-8</kbd> filter status
         <span className="mx-2 text-[#1C2620]">|</span>
         <kbd className="text-[#D7E0DA]">N</kbd> new market
         <span className="mx-2 text-[#1C2620]">|</span>
