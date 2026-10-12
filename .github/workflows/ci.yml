@@ -23,7 +23,7 @@ jobs:
           path: ~/.cache/gltest-direct
           key: gltest-direct-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
       - name: genvm-lint
-        run: genvm-lint check contracts/price_proof.py
+        run: genvm-lint check contracts/priceproof_markets.py
       - name: Direct-mode tests (mock web)
         run: pytest tests/direct/ -q
 
