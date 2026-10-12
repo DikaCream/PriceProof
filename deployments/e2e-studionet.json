@@ -1,1 +1,475 @@
-{"network":"studionet","contractAddress":"0xb0e530cb15E92b2152C339955073a17A055dAD1F","wallet":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","ranAt":"2026-10-05T05:37:42.498Z","steps":[{"step":"update_price BTC","method":"update_price","args":["BTC"],"hash":"0x9b90fb616a41c3761846aba05923b5dbc9f03548fa6908d9390356113c60db1f","explorer":"https://explorer-studio.genlayer.com/transactions/0x9b90fb616a41c3761846aba05923b5dbc9f03548fa6908d9390356113c60db1f","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":11,"result":{"price":"85627.985","price_e8":8562798500000,"source":"coinbase","symbol":"BTC","timestamp":1791178599}},{"step":"update_price ETH","method":"update_price","args":["ETH"],"hash":"0xbad90bf90614c7723d6afe268c1eebecfab9a8cec454dc2d1eda1787497abace","explorer":"https://explorer-studio.genlayer.com/transactions/0xbad90bf90614c7723d6afe268c1eebecfab9a8cec454dc2d1eda1787497abace","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":10,"result":{"price":"2700.795","price_e8":270079500000,"source":"coinbase","symbol":"ETH","timestamp":1791178610}},{"step":"create_alert BTC above 1 (should trigger immediately)","method":"create_alert","args":["BTC","1","above","e2e: already met"],"hash":"0xe70a055753b96095076a09e2e50b4548df82a3de5f6020e5e459d90f28449994","explorer":"https://explorer-studio.genlayer.com/transactions/0xe70a055753b96095076a09e2e50b4548df82a3de5f6020e5e459d90f28449994","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":6,"result":{"created_at":1791178621,"direction":"above","id":0,"note":"e2e: already met","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":8562798500000,"status":"triggered","symbol":"BTC","target":"1.00","target_e8":100000000,"triggered_at":1791178621,"triggered_by":"create","triggered_price":"85627.985","triggered_price_e8":8562798500000}},{"step":"create_alert BTC above 10,000,000 (should stay active)","method":"create_alert","args":["BTC","10000000","above","e2e: far target"],"hash":"0x4391a8e360c9fc7b0e98004133aec60d8c9e76c7a90aed52b3c48a027c9e1265","explorer":"https://explorer-studio.genlayer.com/transactions/0x4391a8e360c9fc7b0e98004133aec60d8c9e76c7a90aed52b3c48a027c9e1265","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":5,"result":{"created_at":1791178627,"direction":"above","id":1,"note":"e2e: far target","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":8562798500000,"status":"active","symbol":"BTC","target":"10000000.00","target_e8":1000000000000000,"triggered_at":0,"triggered_by":"","triggered_price":"","triggered_price_e8":0}},{"step":"create_alert SOL below 1,000,000 before SOL price exists","method":"create_alert","args":["SOL","1000000","below","e2e: trigger on update"],"hash":"0x8e6e41023043363f981bd16588c8c6796976483ad191cffbaeda65fa759ac863","explorer":"https://explorer-studio.genlayer.com/transactions/0x8e6e41023043363f981bd16588c8c6796976483ad191cffbaeda65fa759ac863","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":5,"result":{"created_at":1791178632,"direction":"below","id":2,"note":"e2e: trigger on update","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":0,"status":"active","symbol":"SOL","target":"1000000.00","target_e8":100000000000000,"triggered_at":0,"triggered_by":"","triggered_price":"","triggered_price_e8":0}},{"step":"update_price SOL (should trigger the SOL alert)","method":"update_price","args":["SOL"],"hash":"0x1adad6ce99b20979c80e1480b13ca58dfa3dfc53a7a43a0a6ac0314294a0f16f","explorer":"https://explorer-studio.genlayer.com/transactions/0x1adad6ce99b20979c80e1480b13ca58dfa3dfc53a7a43a0a6ac0314294a0f16f","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":11,"result":{"price":"120.355","price_e8":12035500000,"source":"coinbase","symbol":"SOL","timestamp":1791178638}},{"step":"check_alert on the far BTC alert","method":"check_alert","args":[1],"hash":"0x06656b7e14461a31d290db481612317f16dcff6500fbc17036f43ff52eb47fb9","explorer":"https://explorer-studio.genlayer.com/transactions/0x06656b7e14461a31d290db481612317f16dcff6500fbc17036f43ff52eb47fb9","status":"ACCEPTED","consensus":"MAJORITY_AGREE","execution":"SUCCESS","success":true,"seconds":5,"result":{"created_at":1791178627,"direction":"above","id":1,"note":"e2e: far target","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":8562798500000,"status":"active","symbol":"BTC","target":"10000000.00","target_e8":1000000000000000,"triggered_at":0,"triggered_by":"","triggered_price":"","triggered_price_e8":0}}],"checks":[{"name":"BTC price verified on-chain","ok":true,"detail":"85627.985 USD via coinbase"},{"name":"BTC within 2% of Coinbase reference","ok":true,"detail":"ref 85627.985"},{"name":"ETH price verified on-chain","ok":true,"detail":"2700.795 USD via coinbase"},{"name":"ETH within 2% of Coinbase reference","ok":true,"detail":"ref 2701.315"},{"name":"Immediate alert triggered on create","ok":true,"detail":"triggered at 85627.985"},{"name":"Far alert stays active","ok":true,"detail":""},{"name":"SOL alert active before any SOL price","ok":true,"detail":""},{"name":"SOL alert triggered by update_price","ok":true,"detail":"at 120.355"},{"name":"check_alert keeps far alert active","ok":true,"detail":""},{"name":"get_all_prices lists BTC/ETH/SOL with prices","ok":true,"detail":""},{"name":"get_history(BTC) has the verified point","ok":true,"detail":""},{"name":"get_alerts returns 3 alerts newest first","ok":true,"detail":""},{"name":"get_alerts_by_owner returns my alerts","ok":true,"detail":""},{"name":"get_stats counts","ok":true,"detail":"{\"active\":1,\"alerts\":3,\"assets\":3,\"cancelled\":0,\"triggered\":2,\"updaters\":1,\"updates\":3}"},{"name":"get_top_updaters includes deployer","ok":true,"detail":""}],"views":{"prices":[{"active_alerts":1,"name":"Bitcoin","price":"85627.985","price_e8":8562798500000,"source":"coinbase","symbol":"BTC","updated_at":1791178599,"updater":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","updates":1},{"active_alerts":0,"name":"Ethereum","price":"2700.795","price_e8":270079500000,"source":"coinbase","symbol":"ETH","updated_at":1791178610,"updater":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","updates":1},{"active_alerts":0,"name":"Solana","price":"120.355","price_e8":12035500000,"source":"coinbase","symbol":"SOL","updated_at":1791178638,"updater":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","updates":1}],"history":[{"price":"85627.985","price_e8":8562798500000,"source":"coinbase","timestamp":1791178599,"updater":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3"}],"alerts":[{"created_at":1791178632,"direction":"below","id":2,"note":"e2e: trigger on update","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":0,"status":"triggered","symbol":"SOL","target":"1000000.00","target_e8":100000000000000,"triggered_at":1791178638,"triggered_by":"update","triggered_price":"120.355","triggered_price_e8":12035500000},{"created_at":1791178627,"direction":"above","id":1,"note":"e2e: far target","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":8562798500000,"status":"active","symbol":"BTC","target":"10000000.00","target_e8":1000000000000000,"triggered_at":0,"triggered_by":"","triggered_price":"","triggered_price_e8":0},{"created_at":1791178621,"direction":"above","id":0,"note":"e2e: already met","owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","price_at_creation_e8":8562798500000,"status":"triggered","symbol":"BTC","target":"1.00","target_e8":100000000,"triggered_at":1791178621,"triggered_by":"create","triggered_price":"85627.985","triggered_price_e8":8562798500000}],"stats":{"active":1,"alerts":3,"assets":3,"cancelled":0,"triggered":2,"updaters":1,"updates":3},"top":[{"address":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","updates":3}],"config":{"decimals":8,"max_history":48,"owner":"0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3","sources":["coinbase","coingecko","kraken"],"symbols":["BTC","ETH","SOL"],"tolerance_bps":150}},"passed":true}
+{
+  "network": "studionet",
+  "contractAddress": "0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
+  "explorer": "https://explorer-studio.genlayer.com/address/0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
+  "wallets": {
+    "A": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+    "B": "0x4114320e6217407814992C42DC4573ea85A00b60"
+  },
+  "ranAt": "2026-10-12T03:44:16.668Z",
+  "steps": [
+    {
+      "step": "claim starting points (A)",
+      "wallet": "A",
+      "method": "claim_points",
+      "tx": "0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "claim starting points (B)",
+      "wallet": "B",
+      "method": "claim_points",
+      "tx": "0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 8
+    },
+    {
+      "step": "deterministic rejection: URL shortener source",
+      "wallet": "A",
+      "method": "create_market",
+      "tx": "0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
+      "status": "ACCEPTED",
+      "execution": "ERROR",
+      "ok": false,
+      "expected": "revert",
+      "seconds": 4,
+      "error": ""
+    },
+    {
+      "step": "AI validity check: subjective question",
+      "wallet": "A",
+      "method": "create_market",
+      "tx": "0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 18
+    },
+    {
+      "step": "create market M1 (Argentina 2022)",
+      "wallet": "A",
+      "method": "create_market",
+      "tx": "0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 17
+    },
+    {
+      "step": "create market M2 (Croatia 2018, expect NO)",
+      "wallet": "A",
+      "method": "create_market",
+      "tx": "0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 13
+    },
+    {
+      "step": "stake YES 300 on M1",
+      "wallet": "A",
+      "method": "stake",
+      "tx": "0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 4
+    },
+    {
+      "step": "stake NO 200 on M1",
+      "wallet": "B",
+      "method": "stake",
+      "tx": "0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "stake YES 300 on M2",
+      "wallet": "A",
+      "method": "stake",
+      "tx": "0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "stake NO 200 on M2",
+      "wallet": "B",
+      "method": "stake",
+      "tx": "0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "resolve M1 (AI validators read source)",
+      "wallet": "A",
+      "method": "resolve",
+      "tx": "0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 29
+    },
+    {
+      "step": "resolve M2",
+      "wallet": "B",
+      "method": "resolve",
+      "tx": "0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 17
+    },
+    {
+      "step": "dispute M1 by B (bond 100)",
+      "wallet": "B",
+      "method": "dispute",
+      "tx": "0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 4
+    },
+    {
+      "step": "resolve_dispute M1 (appeal round)",
+      "wallet": "A",
+      "method": "resolve_dispute",
+      "tx": "0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 55
+    },
+    {
+      "step": "finalize M2 after window",
+      "wallet": "B",
+      "method": "finalize",
+      "tx": "0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "claim M1 (A)",
+      "wallet": "A",
+      "method": "claim",
+      "tx": "0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 9
+    },
+    {
+      "step": "claim M1 (B)",
+      "wallet": "B",
+      "method": "claim",
+      "tx": "0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 4
+    },
+    {
+      "step": "claim M2 (A)",
+      "wallet": "A",
+      "method": "claim",
+      "tx": "0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 5
+    },
+    {
+      "step": "claim M2 (B)",
+      "wallet": "B",
+      "method": "claim",
+      "tx": "0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
+      "explorer": "https://explorer-studio.genlayer.com/transactions/0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
+      "status": "ACCEPTED",
+      "execution": "SUCCESS",
+      "ok": true,
+      "expected": "success",
+      "seconds": 4
+    }
+  ],
+  "invalidMarket": {
+    "category": "SPORTS",
+    "created_at": 1791776346,
+    "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+    "criteria": "YES if Messi is the best player ever, NO otherwise, based on general opinion.",
+    "deadline": 1791776946,
+    "dispute_ends": 0,
+    "dispute_open": false,
+    "dispute_reason": "",
+    "dispute_result": "",
+    "dispute_source": "",
+    "dispute_window": 120,
+    "disputer": "",
+    "finalized_at": 0,
+    "id": 0,
+    "invalid_reason": "The question is purely subjective and the resolution criteria rely on 'general opinion', which is unverifiable and ambiguous.",
+    "no_total": 0,
+    "outcome": "",
+    "pool": 0,
+    "proposed_at": 0,
+    "question": "Is Lionel Messi the greatest footballer of all time?",
+    "rounds": 0,
+    "slashed": 0,
+    "sources": [
+      "https://en.wikipedia.org/wiki/Lionel_Messi"
+    ],
+    "stakers": 0,
+    "status": "INVALID",
+    "trusted_sources": [
+      true
+    ],
+    "yes_pct": 50,
+    "yes_total": 0
+  },
+  "markets": {
+    "M1": {
+      "category": "SPORTS",
+      "created_at": 1791776366,
+      "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "criteria": "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
+      "deadline": 1791776485,
+      "dispute_ends": 1791776630,
+      "dispute_open": false,
+      "dispute_reason": "The proposed outcome contradicts the official final result; please re-check the scoreline and penalty shoot-out.",
+      "dispute_result": "UPHELD",
+      "dispute_source": "https://www.bbc.com/sport/football/64062543",
+      "dispute_window": 120,
+      "disputer": "0x4114320e6217407814992C42DC4573ea85A00b60",
+      "finalized_at": 1791776561,
+      "id": 1,
+      "invalid_reason": "",
+      "no_total": 200,
+      "outcome": "YES",
+      "pool": 600,
+      "proposed_at": 1791776510,
+      "question": "Did Argentina win the 2022 FIFA World Cup final?",
+      "rounds": 2,
+      "slashed": 100,
+      "sources": [
+        "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
+      ],
+      "stakers": 2,
+      "status": "FINALIZED",
+      "trusted_sources": [
+        true
+      ],
+      "yes_pct": 60,
+      "yes_total": 300
+    },
+    "M2": {
+      "category": "SPORTS",
+      "created_at": 1791776383,
+      "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "criteria": "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
+      "deadline": 1791776505,
+      "dispute_ends": 1791776599,
+      "dispute_open": false,
+      "dispute_reason": "",
+      "dispute_result": "",
+      "dispute_source": "",
+      "dispute_window": 60,
+      "disputer": "",
+      "finalized_at": 1791776617,
+      "id": 2,
+      "invalid_reason": "",
+      "no_total": 200,
+      "outcome": "NO",
+      "pool": 500,
+      "proposed_at": 1791776539,
+      "question": "Did Croatia win the 2018 FIFA World Cup final?",
+      "rounds": 1,
+      "slashed": 0,
+      "sources": [
+        "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+      ],
+      "stakers": 2,
+      "status": "FINALIZED",
+      "trusted_sources": [
+        true
+      ],
+      "yes_pct": 60,
+      "yes_total": 300
+    }
+  },
+  "evidence": {
+    "M1": [
+      {
+        "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "evidence_quote": "Argentina won the ensuing penalty shoot-out 4\u20132 to win their third World Cup",
+        "kind": "INITIAL",
+        "outcome": "YES",
+        "reasoning": "The source explicitly states Argentina won the final match via a penalty shoot-out.",
+        "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+        "sources": [
+          "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
+        ],
+        "timestamp": 1791776510
+      },
+      {
+        "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "evidence_quote": "Argentina won the ensuing penalty shoot-out 4\u20132 to win their third World Cup, and their first since 1986.",
+        "kind": "APPEAL",
+        "outcome": "YES",
+        "reasoning": "The Wikipedia source explicitly states that Argentina won the penalty shoot-out and thereby the 2022 World Cup final, so the dispute's claim of a contradicting official result has no source support.",
+        "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+        "sources": [
+          "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+          "https://www.bbc.com/sport/football/64062543"
+        ],
+        "timestamp": 1791776561
+      }
+    ],
+    "M2": [
+      {
+        "caller": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "evidence_quote": "The final score was 4\u20132 to France.",
+        "kind": "INITIAL",
+        "outcome": "NO",
+        "reasoning": "The source explicitly states that France won the final with a score of 4\u20132, meaning Croatia did not win.",
+        "source_url": "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final",
+        "sources": [
+          "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+        ],
+        "timestamp": 1791776539
+      }
+    ]
+  },
+  "users": {
+    "A": {
+      "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "balance": 1000,
+      "claimed_start": true,
+      "positions": [
+        {
+          "claimable": 0,
+          "claimed": true,
+          "market_id": 1,
+          "no": 0,
+          "outcome": "YES",
+          "payout": 600,
+          "question": "Did Argentina win the 2022 FIFA World Cup final?",
+          "status": "FINALIZED",
+          "yes": 300
+        },
+        {
+          "claimable": 0,
+          "claimed": true,
+          "market_id": 2,
+          "no": 0,
+          "outcome": "NO",
+          "payout": 0,
+          "question": "Did Croatia win the 2018 FIFA World Cup final?",
+          "status": "FINALIZED",
+          "yes": 300
+        }
+      ]
+    },
+    "B": {
+      "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
+      "balance": 1000,
+      "claimed_start": true,
+      "positions": [
+        {
+          "claimable": 0,
+          "claimed": true,
+          "market_id": 1,
+          "no": 200,
+          "outcome": "YES",
+          "payout": 0,
+          "question": "Did Argentina win the 2022 FIFA World Cup final?",
+          "status": "FINALIZED",
+          "yes": 0
+        },
+        {
+          "claimable": 0,
+          "claimed": true,
+          "market_id": 2,
+          "no": 200,
+          "outcome": "NO",
+          "payout": 500,
+          "question": "Did Croatia win the 2018 FIFA World Cup final?",
+          "status": "FINALIZED",
+          "yes": 0
+        }
+      ]
+    }
+  },
+  "leaderboard": [
+    {
+      "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
+      "markets": 2,
+      "points": 1000
+    },
+    {
+      "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "markets": 2,
+      "points": 1000
+    }
+  ],
+  "stats": {
+    "by_status": {
+      "CLOSED": 0,
+      "DISPUTED": 0,
+      "FINALIZED": 2,
+      "INVALID": 1,
+      "OPEN": 0,
+      "PROPOSED": 0
+    },
+    "disputes": 1,
+    "flipped": 0,
+    "markets": 3,
+    "total_staked": 1000,
+    "users": 2
+  }
+}

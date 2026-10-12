@@ -1,4 +1,4 @@
-// Deploys contracts/price_proof.py to GenLayer Studionet using the wallet in .env.
+// Deploys contracts/priceproof_markets.py to GenLayer Studionet using the wallet in .env.
 // Usage:
 //   node scripts/deploy.mjs              # submit a new deployment
 //   node scripts/deploy.mjs --tx 0x...   # resume tracking an already-submitted deployment
@@ -13,7 +13,7 @@ let txHash = txFlag > -1 ? process.argv[txFlag + 1] : undefined;
 
 console.log(`Deployer: ${deployer}`);
 if (!txHash) {
-  const code = readFileSync(new URL("../contracts/price_proof.py", import.meta.url), "utf8");
+  const code = readFileSync(new URL("../contracts/priceproof_markets.py", import.meta.url), "utf8");
   console.log("Submitting deploy transaction to Studionet...");
   txHash = await client.deployContract({ code, args: [] });
 }

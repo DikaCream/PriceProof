@@ -1,111 +1,104 @@
-// Real end-to-end test of PriceProof on GenLayer Studionet.
-// Updates BTC/ETH/SOL prices from the web under validator consensus, creates alerts
-// (one that triggers immediately, one that must stay active, one that triggers on update),
-// then verifies every view. Results: deployments/e2e-studionet.json
+// Real end-to-end run of PriceProof Markets on Studionet with two wallets.
+// Wallet A = PRIVATE_KEY (deployer), wallet B = PRIVATE_KEY_2 (throwaway). Writes deployments/e2e-studionet.json.
 import { readFileSync, writeFileSync } from "node:fs";
-import { getClient, waitAndInspect, parseReadable, toPlain, EXPLORER_URL } from "./lib.mjs";
+import { createAccount, createClient } from "genlayer-js";
+import { studionet } from "genlayer-js/chains";
+import { getClient, toPlain, waitAndInspect, EXPLORER_URL } from "./lib.mjs";
 
-const deployment = JSON.parse(readFileSync(new URL("../deployments/studionet.json", import.meta.url), "utf8"));
-const address = process.env.CONTRACT_ADDRESS || deployment.contractAddress;
-const client = getClient();
-const me = client.account.address;
+const { contractAddress: address } = JSON.parse(readFileSync(new URL("../deployments/studionet.json", import.meta.url)));
+const A = getClient();
+if (!/^0x[0-9a-fA-F]{64}$/.test(process.env.PRIVATE_KEY_2 || "")) throw new Error("PRIVATE_KEY_2 missing in .env");
+const B = createClient({ chain: studionet, endpoint: "https://studio.genlayer.com/api", account: createAccount(process.env.PRIVATE_KEY_2) });
+const wallets = { A: A.account.address, B: B.account.address };
 const steps = [];
-const checks = [];
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const now = () => Math.floor(Date.now() / 1000);
+const read = async (fn, args = []) => toPlain(await A.readContract({ address, functionName: fn, args }));
 
-const read = async (functionName, args = []) => toPlain(await client.readContract({ address, functionName, args }));
-
-async function write(label, functionName, args) {
-  const started = Date.now();
-  const hash = await client.writeContract({ address, functionName, args, value: 0n });
-  console.log(`-> ${label}: ${hash}`);
-  const o = await waitAndInspect(client, hash);
-  const step = {
-    step: label,
-    method: functionName,
-    args,
-    hash,
-    explorer: `${EXPLORER_URL}/transactions/${hash}`,
-    status: o.statusName,
-    consensus: o.consensusResult,
-    execution: o.executionResult,
-    success: o.success,
-    seconds: Math.round((Date.now() - started) / 1000),
-    result: parseReadable(o.returnValue),
-    raw: o.returnValue,
-  };
-  console.log(`   ${step.status} / ${step.consensus} / ${step.execution} (${step.seconds}s) ${step.raw ?? ""}`.slice(0, 400));
-  if (!o.success && o.stderr) console.log(`   stderr: ${String(o.stderr).slice(0, 400)}`);
-  steps.push(step);
-  return step;
-}
-
-function check(name, ok, detail = "") {
-  checks.push({ name, ok: Boolean(ok), detail });
-  console.log(`   [${ok ? "PASS" : "FAIL"}] ${name}${detail ? " - " + detail : ""}`);
-}
-
-async function referencePrice(pair) {
+async function write(label, who, fn, args, { expectFail = false } = {}) {
+  const c = who === "A" ? A : B;
+  const t = Date.now();
+  let hash, out;
   try {
-    const r = await fetch(`https://api.coinbase.com/v2/prices/${pair}/spot`);
-    return Number((await r.json()).data.amount);
-  } catch {
-    return null;
+    hash = await c.writeContract({ address, functionName: fn, args, value: 0n });
+    out = await waitAndInspect(c, hash, { retries: 200, interval: 4000 });
+  } catch (e) {
+    out = { success: false, error: String(e.shortMessage || e.message).slice(0, 200) };
   }
+  const row = {
+    step: label, wallet: who, method: fn, tx: hash || null, explorer: hash ? `${EXPLORER_URL}/transactions/${hash}` : null,
+    status: out.statusName || "REJECTED", execution: out.executionResult || "ERROR", ok: out.success === true,
+    expected: expectFail ? "revert" : "success", seconds: Math.round((Date.now() - t) / 1000),
+    error: out.success ? undefined : (out.stderr || out.error || out.returnValue || "").toString().slice(-240),
+  };
+  steps.push(row);
+  console.log(`${row.ok ? "OK  " : "FAIL"} ${label} (${fn}) ${row.status}/${row.execution} ${row.seconds}s ${hash || ""}`);
+  return row;
+}
+const save = (extra = {}) =>
+  writeFileSync(new URL("../deployments/e2e-studionet.json", import.meta.url),
+    JSON.stringify({ network: "studionet", contractAddress: address, explorer: `${EXPLORER_URL}/address/${address}`, wallets, ranAt: new Date().toISOString(), steps, ...extra }, null, 2) + "\n");
+
+const WIKI22 = "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final";
+const WIKI18 = "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final";
+
+// --- points
+for (const w of ["A", "B"]) {
+  const u = await read("get_user", [wallets[w]]);
+  if (!u.claimed_start) await write(`claim starting points (${w})`, w, "claim_points", []);
 }
 
-console.log(`Contract ${address} | wallet ${me}`);
+// --- invalid markets
+await write("deterministic rejection: URL shortener source", "A", "create_market",
+  ["Did Argentina win the 2022 FIFA World Cup final?", "YES if the source states Argentina won the final, NO otherwise.", ["https://bit.ly/3xyz"], now() + 600, "SPORTS", 120], { expectFail: true });
+const before = (await read("get_stats")).markets;
+await write("AI validity check: subjective question", "A", "create_market",
+  ["Is Lionel Messi the greatest footballer of all time?", "YES if Messi is the best player ever, NO otherwise, based on general opinion.", ["https://en.wikipedia.org/wiki/Lionel_Messi"], now() + 600, "SPORTS", 120]);
+const invalid = await read("get_market", [before]);
+console.log("invalid market:", invalid.status, invalid.invalid_reason);
 
-for (const sym of ["BTC", "ETH"]) {
-  const s = await write(`update_price ${sym}`, "update_price", [sym]);
-  const ref = await referencePrice(`${sym}-USD`);
-  const onchain = Number(s.result.price_e8 ?? 0) / 1e8;
-  check(`${sym} price verified on-chain`, s.success && onchain > 0, `${onchain} USD via ${s.result.source}`);
-  if (ref) check(`${sym} within 2% of Coinbase reference`, Math.abs(onchain - ref) / ref < 0.02, `ref ${ref}`);
+// --- two valid markets: M1 (dispute path), M2 (no dispute, finalize after window)
+const deadline = now() + 120;
+const m1id = (await read("get_stats")).markets;
+await write("create market M1 (Argentina 2022)", "A", "create_market",
+  ["Did Argentina win the 2022 FIFA World Cup final?",
+   "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
+   [WIKI22], deadline, "SPORTS", 120]);
+const m2id = m1id + 1;
+await write("create market M2 (Croatia 2018, expect NO)", "A", "create_market",
+  ["Did Croatia win the 2018 FIFA World Cup final?",
+   "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
+   [WIKI18], deadline + 20, "SPORTS", 60]);
+for (const id of [m1id, m2id]) {
+  await write(`stake YES 300 on M${id - m1id + 1}`, "A", "stake", [id, "YES", 300]);
+  await write(`stake NO 200 on M${id - m1id + 1}`, "B", "stake", [id, "NO", 200]);
 }
+save({ invalidMarket: invalid });
+const wait = deadline + 25 - now();
+if (wait > 0) { console.log(`waiting ${wait}s for deadlines`); await sleep(wait * 1000); }
 
-const btc = await read("get_price", ["BTC"]);
-const instant = await write("create_alert BTC above 1 (should trigger immediately)", "create_alert", ["BTC", "1", "above", "e2e: already met"]);
-check("Immediate alert triggered on create", instant.result.status === "triggered" && instant.result.triggered_by === "create", `triggered at ${instant.result.triggered_price}`);
+await write("resolve M1 (AI validators read source)", "A", "resolve", [m1id]);
+await write("resolve M2", "B", "resolve", [m2id]);
+let m1 = await read("get_market", [m1id]);
+console.log("M1 proposed:", m1.outcome);
+const loser = m1.outcome === "YES" ? "B" : "A";
+await write(`dispute M1 by ${loser} (bond 100)`, loser, "dispute",
+  [m1id, "The proposed outcome contradicts the official final result; please re-check the scoreline and penalty shoot-out.", "https://www.bbc.com/sport/football/64062543"]);
+await write("resolve_dispute M1 (appeal round)", "A", "resolve_dispute", [m1id]);
 
-const never = await write("create_alert BTC above 10,000,000 (should stay active)", "create_alert", ["BTC", "10000000", "above", "e2e: far target"]);
-check("Far alert stays active", never.result.status === "active");
+const m2 = await read("get_market", [m2id]);
+const w2 = m2.dispute_ends - now() + 5;
+if (w2 > 0) { console.log(`waiting ${w2}s for M2 dispute window`); await sleep(w2 * 1000); }
+await write("finalize M2 after window", "B", "finalize", [m2id]);
+for (const id of [m1id, m2id]) for (const w of ["A", "B"]) await write(`claim M${id - m1id + 1} (${w})`, w, "claim", [id]);
 
-const solPending = await write("create_alert SOL below 1,000,000 before SOL price exists", "create_alert", ["SOL", "1000000", "below", "e2e: trigger on update"]);
-check("SOL alert active before any SOL price", solPending.result.status === "active");
-
-const sol = await write("update_price SOL (should trigger the SOL alert)", "update_price", ["SOL"]);
-const solAlert = await read("get_alert", [solPending.result.id]);
-check("SOL alert triggered by update_price", solAlert.status === "triggered" && solAlert.triggered_by === "update", `at ${solAlert.triggered_price}`);
-
-const recheck = await write("check_alert on the far BTC alert", "check_alert", [never.result.id]);
-check("check_alert keeps far alert active", recheck.result.status === "active");
-
-// views
-const prices = await read("get_all_prices");
-const history = await read("get_history", ["BTC", 10]);
-const alerts = await read("get_alerts", [0, 20]);
-const mine = await read("get_alerts_by_owner", [me]);
-const stats = await read("get_stats");
-const top = await read("get_top_updaters", [10]);
-const config = await read("get_config");
-
-check("get_all_prices lists BTC/ETH/SOL with prices", ["BTC", "ETH", "SOL"].every((s) => prices.find((p) => p.symbol === s)?.price_e8 > 0));
-check("get_history(BTC) has the verified point", history.length >= 1 && history[0].price_e8 === btc.price_e8);
-check("get_alerts returns 3 alerts newest first", alerts.length >= 3 && alerts[0].id > alerts[alerts.length - 1].id);
-check("get_alerts_by_owner returns my alerts", mine.length >= 3 && mine.every((a) => a.owner.toLowerCase() === me.toLowerCase()));
-check("get_stats counts", stats.updates >= 3 && stats.alerts >= 3 && stats.triggered >= 2 && stats.active >= 1, JSON.stringify(stats));
-check("get_top_updaters includes deployer", top.some((r) => r.address.toLowerCase() === me.toLowerCase()));
-
-const out = {
-  network: "studionet",
-  contractAddress: address,
-  wallet: me,
-  ranAt: new Date().toISOString(),
-  steps: steps.map(({ raw, ...s }) => s),
-  checks,
-  views: { prices, history, alerts, stats, top, config },
-  passed: checks.every((c) => c.ok) && steps.every((s) => s.success),
+const result = {
+  invalidMarket: invalid,
+  markets: { M1: await read("get_market", [m1id]), M2: await read("get_market", [m2id]) },
+  evidence: { M1: await read("get_evidence", [m1id]), M2: await read("get_evidence", [m2id]) },
+  users: { A: await read("get_user", [wallets.A]), B: await read("get_user", [wallets.B]) },
+  leaderboard: await read("get_leaderboard", [10]),
+  stats: await read("get_stats"),
 };
-writeFileSync(new URL("../deployments/e2e-studionet.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");
-console.log(`\nE2E ${out.passed ? "PASSED" : "FAILED"} - ${checks.filter((c) => c.ok).length}/${checks.length} checks. Saved deployments/e2e-studionet.json`);
-process.exit(out.passed ? 0 : 1);
+save(result);
+console.log(JSON.stringify({ M1: result.markets.M1.outcome + "/" + result.markets.M1.dispute_result, M2: result.markets.M2.outcome, A: result.users.A.balance, B: result.users.B.balance }));
