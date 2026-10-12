@@ -1,475 +1,805 @@
 {
-  "network": "studionet",
-  "contractAddress": "0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
-  "explorer": "https://explorer-studio.genlayer.com/address/0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
-  "wallets": {
-    "A": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-    "B": "0x4114320e6217407814992C42DC4573ea85A00b60"
-  },
-  "ranAt": "2026-10-12T03:44:16.668Z",
-  "steps": [
-    {
-      "step": "claim starting points (A)",
-      "wallet": "A",
-      "method": "claim_points",
-      "tx": "0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
+  "note": "previousContract = full markets e2e on the earlier contract (before dispute timeout). timeoutRun = current contract.",
+  "currentContract": "0x0e362036Aed7836F6C4Fc2220dFd20B6CbB7E06B",
+  "previousContract": {
+    "network": "studionet",
+    "contractAddress": "0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
+    "explorer": "https://explorer-studio.genlayer.com/address/0xb0348dC3eb997825EE92FA285c5cFC9B3eA1C1f3",
+    "wallets": {
+      "A": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "B": "0x4114320e6217407814992C42DC4573ea85A00b60"
     },
-    {
-      "step": "claim starting points (B)",
-      "wallet": "B",
-      "method": "claim_points",
-      "tx": "0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 8
-    },
-    {
-      "step": "deterministic rejection: URL shortener source",
-      "wallet": "A",
-      "method": "create_market",
-      "tx": "0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
-      "status": "ACCEPTED",
-      "execution": "ERROR",
-      "ok": false,
-      "expected": "revert",
-      "seconds": 4,
-      "error": ""
-    },
-    {
-      "step": "AI validity check: subjective question",
-      "wallet": "A",
-      "method": "create_market",
-      "tx": "0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 18
-    },
-    {
-      "step": "create market M1 (Argentina 2022)",
-      "wallet": "A",
-      "method": "create_market",
-      "tx": "0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 17
-    },
-    {
-      "step": "create market M2 (Croatia 2018, expect NO)",
-      "wallet": "A",
-      "method": "create_market",
-      "tx": "0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 13
-    },
-    {
-      "step": "stake YES 300 on M1",
-      "wallet": "A",
-      "method": "stake",
-      "tx": "0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 4
-    },
-    {
-      "step": "stake NO 200 on M1",
-      "wallet": "B",
-      "method": "stake",
-      "tx": "0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
-    },
-    {
-      "step": "stake YES 300 on M2",
-      "wallet": "A",
-      "method": "stake",
-      "tx": "0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
-    },
-    {
-      "step": "stake NO 200 on M2",
-      "wallet": "B",
-      "method": "stake",
-      "tx": "0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
-    },
-    {
-      "step": "resolve M1 (AI validators read source)",
-      "wallet": "A",
-      "method": "resolve",
-      "tx": "0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 29
-    },
-    {
-      "step": "resolve M2",
-      "wallet": "B",
-      "method": "resolve",
-      "tx": "0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 17
-    },
-    {
-      "step": "dispute M1 by B (bond 100)",
-      "wallet": "B",
-      "method": "dispute",
-      "tx": "0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 4
-    },
-    {
-      "step": "resolve_dispute M1 (appeal round)",
-      "wallet": "A",
-      "method": "resolve_dispute",
-      "tx": "0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 55
-    },
-    {
-      "step": "finalize M2 after window",
-      "wallet": "B",
-      "method": "finalize",
-      "tx": "0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
-    },
-    {
-      "step": "claim M1 (A)",
-      "wallet": "A",
-      "method": "claim",
-      "tx": "0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 9
-    },
-    {
-      "step": "claim M1 (B)",
-      "wallet": "B",
-      "method": "claim",
-      "tx": "0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 4
-    },
-    {
-      "step": "claim M2 (A)",
-      "wallet": "A",
-      "method": "claim",
-      "tx": "0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 5
-    },
-    {
-      "step": "claim M2 (B)",
-      "wallet": "B",
-      "method": "claim",
-      "tx": "0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
-      "explorer": "https://explorer-studio.genlayer.com/transactions/0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
-      "status": "ACCEPTED",
-      "execution": "SUCCESS",
-      "ok": true,
-      "expected": "success",
-      "seconds": 4
-    }
-  ],
-  "invalidMarket": {
-    "category": "SPORTS",
-    "created_at": 1791776346,
-    "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-    "criteria": "YES if Messi is the best player ever, NO otherwise, based on general opinion.",
-    "deadline": 1791776946,
-    "dispute_ends": 0,
-    "dispute_open": false,
-    "dispute_reason": "",
-    "dispute_result": "",
-    "dispute_source": "",
-    "dispute_window": 120,
-    "disputer": "",
-    "finalized_at": 0,
-    "id": 0,
-    "invalid_reason": "The question is purely subjective and the resolution criteria rely on 'general opinion', which is unverifiable and ambiguous.",
-    "no_total": 0,
-    "outcome": "",
-    "pool": 0,
-    "proposed_at": 0,
-    "question": "Is Lionel Messi the greatest footballer of all time?",
-    "rounds": 0,
-    "slashed": 0,
-    "sources": [
-      "https://en.wikipedia.org/wiki/Lionel_Messi"
+    "ranAt": "2026-10-12T03:44:16.668Z",
+    "steps": [
+      {
+        "step": "claim starting points (A)",
+        "wallet": "A",
+        "method": "claim_points",
+        "tx": "0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x83a55dee2f254d3a9cac2ec8e09b0460f62e266ad0bd6a26f1f0dfeb3a2633ca",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "claim starting points (B)",
+        "wallet": "B",
+        "method": "claim_points",
+        "tx": "0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x4f000277af00da1e7974fc8180a3fca0781271b947d02746cb31c8e972f7492d",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 8
+      },
+      {
+        "step": "deterministic rejection: URL shortener source",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x1bcb1e3292632fe9dedb36ae75022f75005ba0b7d6801161db9f677d7cd807be",
+        "status": "ACCEPTED",
+        "execution": "ERROR",
+        "ok": false,
+        "expected": "revert",
+        "seconds": 4,
+        "error": ""
+      },
+      {
+        "step": "AI validity check: subjective question",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x705c9a65afbb0f4f663f42e862389eb7debb74d5c46187c085f0ee4e5d031293",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 18
+      },
+      {
+        "step": "create market M1 (Argentina 2022)",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xaf42db270a2e2ce920b6196bef39a1529a64ee05403120bce1bed9c2b9c8405f",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 17
+      },
+      {
+        "step": "create market M2 (Croatia 2018, expect NO)",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xd4af3405250e89152f3e63e49e35f3db33e7fc40144a028424f55fbc85469717",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 13
+      },
+      {
+        "step": "stake YES 300 on M1",
+        "wallet": "A",
+        "method": "stake",
+        "tx": "0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x785802eed595f4b7db75de5434c5ab7b11d8e1ffa8bca7af25093b00fdc1b10b",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "stake NO 200 on M1",
+        "wallet": "B",
+        "method": "stake",
+        "tx": "0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x8df1a00e4d021f4715371894f855bab1b26c5e45dd120b40566fe5aa73027ec7",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "stake YES 300 on M2",
+        "wallet": "A",
+        "method": "stake",
+        "tx": "0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x35662785cfcb55f0e1cb50cfcc0c804b3f2a10065620397bcf4e69d214636a24",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "stake NO 200 on M2",
+        "wallet": "B",
+        "method": "stake",
+        "tx": "0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xbacdde0ece8ec43ad2981268cc14ba419154273206c16c4005965c1e50fe63a1",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "resolve M1 (AI validators read source)",
+        "wallet": "A",
+        "method": "resolve",
+        "tx": "0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xc8294a6c1790772843ef891d735efecb37bef72e961413a67f79f0b7f47837a0",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 29
+      },
+      {
+        "step": "resolve M2",
+        "wallet": "B",
+        "method": "resolve",
+        "tx": "0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xcf07d0b0abb58e2b571423e5bd259f998f67ebb030c4fd5b77e72422998ee736",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 17
+      },
+      {
+        "step": "dispute M1 by B (bond 100)",
+        "wallet": "B",
+        "method": "dispute",
+        "tx": "0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xd6d361cc7512264557c9fb9d661913c76bc0ef104ed6f853473b1a9bc50d0ff6",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "resolve_dispute M1 (appeal round)",
+        "wallet": "A",
+        "method": "resolve_dispute",
+        "tx": "0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x23dd46f3d66cf20781f38bc5e5205a8df178229e2a1e32bc73a29232d453823c",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 55
+      },
+      {
+        "step": "finalize M2 after window",
+        "wallet": "B",
+        "method": "finalize",
+        "tx": "0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x906fb43e1b1645f50d9ef156d6918c9e6785e98f0a83c19ff1d0027d14d11fad",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "claim M1 (A)",
+        "wallet": "A",
+        "method": "claim",
+        "tx": "0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xab9a14a58b8b1f8dd559584d497c8dd18c13934bac825460d69a53774c04735c",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "claim M1 (B)",
+        "wallet": "B",
+        "method": "claim",
+        "tx": "0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x1d397d368c9e5ba8543c809e4f1a8bd6d5914e7cf2bf503c6196151e2602d9fa",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "claim M2 (A)",
+        "wallet": "A",
+        "method": "claim",
+        "tx": "0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x500cfbc15478847a55c316eeb0a59e51ac86dd22e69305883e0118b79a3efe94",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 5
+      },
+      {
+        "step": "claim M2 (B)",
+        "wallet": "B",
+        "method": "claim",
+        "tx": "0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x9a9ab674c44c0ab6faed4a70e4d53159e79b07c2552400fcabb38b4952144692",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      }
     ],
-    "stakers": 0,
-    "status": "INVALID",
-    "trusted_sources": [
-      true
-    ],
-    "yes_pct": 50,
-    "yes_total": 0
-  },
-  "markets": {
-    "M1": {
+    "invalidMarket": {
       "category": "SPORTS",
-      "created_at": 1791776366,
+      "created_at": 1791776346,
       "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-      "criteria": "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
-      "deadline": 1791776485,
-      "dispute_ends": 1791776630,
-      "dispute_open": false,
-      "dispute_reason": "The proposed outcome contradicts the official final result; please re-check the scoreline and penalty shoot-out.",
-      "dispute_result": "UPHELD",
-      "dispute_source": "https://www.bbc.com/sport/football/64062543",
-      "dispute_window": 120,
-      "disputer": "0x4114320e6217407814992C42DC4573ea85A00b60",
-      "finalized_at": 1791776561,
-      "id": 1,
-      "invalid_reason": "",
-      "no_total": 200,
-      "outcome": "YES",
-      "pool": 600,
-      "proposed_at": 1791776510,
-      "question": "Did Argentina win the 2022 FIFA World Cup final?",
-      "rounds": 2,
-      "slashed": 100,
-      "sources": [
-        "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
-      ],
-      "stakers": 2,
-      "status": "FINALIZED",
-      "trusted_sources": [
-        true
-      ],
-      "yes_pct": 60,
-      "yes_total": 300
-    },
-    "M2": {
-      "category": "SPORTS",
-      "created_at": 1791776383,
-      "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-      "criteria": "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
-      "deadline": 1791776505,
-      "dispute_ends": 1791776599,
+      "criteria": "YES if Messi is the best player ever, NO otherwise, based on general opinion.",
+      "deadline": 1791776946,
+      "dispute_ends": 0,
       "dispute_open": false,
       "dispute_reason": "",
       "dispute_result": "",
       "dispute_source": "",
-      "dispute_window": 60,
+      "dispute_window": 120,
       "disputer": "",
-      "finalized_at": 1791776617,
-      "id": 2,
-      "invalid_reason": "",
-      "no_total": 200,
-      "outcome": "NO",
-      "pool": 500,
-      "proposed_at": 1791776539,
-      "question": "Did Croatia win the 2018 FIFA World Cup final?",
-      "rounds": 1,
+      "finalized_at": 0,
+      "id": 0,
+      "invalid_reason": "The question is purely subjective and the resolution criteria rely on 'general opinion', which is unverifiable and ambiguous.",
+      "no_total": 0,
+      "outcome": "",
+      "pool": 0,
+      "proposed_at": 0,
+      "question": "Is Lionel Messi the greatest footballer of all time?",
+      "rounds": 0,
       "slashed": 0,
       "sources": [
-        "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+        "https://en.wikipedia.org/wiki/Lionel_Messi"
       ],
-      "stakers": 2,
-      "status": "FINALIZED",
+      "stakers": 0,
+      "status": "INVALID",
       "trusted_sources": [
         true
       ],
-      "yes_pct": 60,
-      "yes_total": 300
-    }
-  },
-  "evidence": {
-    "M1": [
-      {
-        "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-        "evidence_quote": "Argentina won the ensuing penalty shoot-out 4\u20132 to win their third World Cup",
-        "kind": "INITIAL",
+      "yes_pct": 50,
+      "yes_total": 0
+    },
+    "markets": {
+      "M1": {
+        "category": "SPORTS",
+        "created_at": 1791776366,
+        "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "criteria": "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
+        "deadline": 1791776485,
+        "dispute_ends": 1791776630,
+        "dispute_open": false,
+        "dispute_reason": "The proposed outcome contradicts the official final result; please re-check the scoreline and penalty shoot-out.",
+        "dispute_result": "UPHELD",
+        "dispute_source": "https://www.bbc.com/sport/football/64062543",
+        "dispute_window": 120,
+        "disputer": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "finalized_at": 1791776561,
+        "id": 1,
+        "invalid_reason": "",
+        "no_total": 200,
         "outcome": "YES",
-        "reasoning": "The source explicitly states Argentina won the final match via a penalty shoot-out.",
-        "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+        "pool": 600,
+        "proposed_at": 1791776510,
+        "question": "Did Argentina win the 2022 FIFA World Cup final?",
+        "rounds": 2,
+        "slashed": 100,
         "sources": [
           "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
         ],
-        "timestamp": 1791776510
-      },
-      {
-        "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-        "evidence_quote": "Argentina won the ensuing penalty shoot-out 4\u20132 to win their third World Cup, and their first since 1986.",
-        "kind": "APPEAL",
-        "outcome": "YES",
-        "reasoning": "The Wikipedia source explicitly states that Argentina won the penalty shoot-out and thereby the 2022 World Cup final, so the dispute's claim of a contradicting official result has no source support.",
-        "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
-        "sources": [
-          "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
-          "https://www.bbc.com/sport/football/64062543"
+        "stakers": 2,
+        "status": "FINALIZED",
+        "trusted_sources": [
+          true
         ],
-        "timestamp": 1791776561
-      }
-    ],
-    "M2": [
-      {
-        "caller": "0x4114320e6217407814992C42DC4573ea85A00b60",
-        "evidence_quote": "The final score was 4\u20132 to France.",
-        "kind": "INITIAL",
+        "yes_pct": 60,
+        "yes_total": 300
+      },
+      "M2": {
+        "category": "SPORTS",
+        "created_at": 1791776383,
+        "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "criteria": "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
+        "deadline": 1791776505,
+        "dispute_ends": 1791776599,
+        "dispute_open": false,
+        "dispute_reason": "",
+        "dispute_result": "",
+        "dispute_source": "",
+        "dispute_window": 60,
+        "disputer": "",
+        "finalized_at": 1791776617,
+        "id": 2,
+        "invalid_reason": "",
+        "no_total": 200,
         "outcome": "NO",
-        "reasoning": "The source explicitly states that France won the final with a score of 4\u20132, meaning Croatia did not win.",
-        "source_url": "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final",
+        "pool": 500,
+        "proposed_at": 1791776539,
+        "question": "Did Croatia win the 2018 FIFA World Cup final?",
+        "rounds": 1,
+        "slashed": 0,
         "sources": [
           "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
         ],
-        "timestamp": 1791776539
+        "stakers": 2,
+        "status": "FINALIZED",
+        "trusted_sources": [
+          true
+        ],
+        "yes_pct": 60,
+        "yes_total": 300
       }
-    ]
-  },
-  "users": {
-    "A": {
-      "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-      "balance": 1000,
-      "claimed_start": true,
-      "positions": [
+    },
+    "evidence": {
+      "M1": [
         {
-          "claimable": 0,
-          "claimed": true,
-          "market_id": 1,
-          "no": 0,
+          "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+          "evidence_quote": "Argentina won the ensuing penalty shoot-out 4–2 to win their third World Cup",
+          "kind": "INITIAL",
           "outcome": "YES",
-          "payout": 600,
-          "question": "Did Argentina win the 2022 FIFA World Cup final?",
-          "status": "FINALIZED",
-          "yes": 300
+          "reasoning": "The source explicitly states Argentina won the final match via a penalty shoot-out.",
+          "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+          "sources": [
+            "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
+          ],
+          "timestamp": 1791776510
         },
         {
-          "claimable": 0,
-          "claimed": true,
-          "market_id": 2,
-          "no": 0,
+          "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+          "evidence_quote": "Argentina won the ensuing penalty shoot-out 4–2 to win their third World Cup, and their first since 1986.",
+          "kind": "APPEAL",
+          "outcome": "YES",
+          "reasoning": "The Wikipedia source explicitly states that Argentina won the penalty shoot-out and thereby the 2022 World Cup final, so the dispute's claim of a contradicting official result has no source support.",
+          "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+          "sources": [
+            "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+            "https://www.bbc.com/sport/football/64062543"
+          ],
+          "timestamp": 1791776561
+        }
+      ],
+      "M2": [
+        {
+          "caller": "0x4114320e6217407814992C42DC4573ea85A00b60",
+          "evidence_quote": "The final score was 4–2 to France.",
+          "kind": "INITIAL",
           "outcome": "NO",
-          "payout": 0,
-          "question": "Did Croatia win the 2018 FIFA World Cup final?",
-          "status": "FINALIZED",
-          "yes": 300
+          "reasoning": "The source explicitly states that France won the final with a score of 4–2, meaning Croatia did not win.",
+          "source_url": "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final",
+          "sources": [
+            "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+          ],
+          "timestamp": 1791776539
         }
       ]
     },
-    "B": {
-      "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
-      "balance": 1000,
-      "claimed_start": true,
-      "positions": [
-        {
-          "claimable": 0,
-          "claimed": true,
-          "market_id": 1,
-          "no": 200,
-          "outcome": "YES",
-          "payout": 0,
-          "question": "Did Argentina win the 2022 FIFA World Cup final?",
-          "status": "FINALIZED",
-          "yes": 0
-        },
-        {
-          "claimable": 0,
-          "claimed": true,
-          "market_id": 2,
-          "no": 200,
-          "outcome": "NO",
-          "payout": 500,
-          "question": "Did Croatia win the 2018 FIFA World Cup final?",
-          "status": "FINALIZED",
-          "yes": 0
-        }
-      ]
+    "users": {
+      "A": {
+        "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "balance": 1000,
+        "claimed_start": true,
+        "positions": [
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 1,
+            "no": 0,
+            "outcome": "YES",
+            "payout": 600,
+            "question": "Did Argentina win the 2022 FIFA World Cup final?",
+            "status": "FINALIZED",
+            "yes": 300
+          },
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 2,
+            "no": 0,
+            "outcome": "NO",
+            "payout": 0,
+            "question": "Did Croatia win the 2018 FIFA World Cup final?",
+            "status": "FINALIZED",
+            "yes": 300
+          }
+        ]
+      },
+      "B": {
+        "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "balance": 1000,
+        "claimed_start": true,
+        "positions": [
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 1,
+            "no": 200,
+            "outcome": "YES",
+            "payout": 0,
+            "question": "Did Argentina win the 2022 FIFA World Cup final?",
+            "status": "FINALIZED",
+            "yes": 0
+          },
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 2,
+            "no": 200,
+            "outcome": "NO",
+            "payout": 500,
+            "question": "Did Croatia win the 2018 FIFA World Cup final?",
+            "status": "FINALIZED",
+            "yes": 0
+          }
+        ]
+      }
+    },
+    "leaderboard": [
+      {
+        "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "markets": 2,
+        "points": 1000
+      },
+      {
+        "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "markets": 2,
+        "points": 1000
+      }
+    ],
+    "stats": {
+      "by_status": {
+        "CLOSED": 0,
+        "DISPUTED": 0,
+        "FINALIZED": 2,
+        "INVALID": 1,
+        "OPEN": 0,
+        "PROPOSED": 0
+      },
+      "disputes": 1,
+      "flipped": 0,
+      "markets": 3,
+      "total_staked": 1000,
+      "users": 2
     }
   },
-  "leaderboard": [
-    {
-      "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
-      "markets": 2,
-      "points": 1000
+  "timeoutRun": {
+    "contractAddress": "0x0e362036Aed7836F6C4Fc2220dFd20B6CbB7E06B",
+    "explorer": "https://explorer-studio.genlayer.com/address/0x0e362036Aed7836F6C4Fc2220dFd20B6CbB7E06B",
+    "wallets": {
+      "A": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+      "B": "0x4114320e6217407814992C42DC4573ea85A00b60"
     },
-    {
-      "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
-      "markets": 2,
-      "points": 1000
+    "ranAt": "2026-10-12T04:11:02.310Z",
+    "steps": [
+      {
+        "step": "claim starting points (A)",
+        "wallet": "A",
+        "method": "claim_points",
+        "tx": "0x68926484c82b22341cefec57131ef66f8ba0409d94e4a65e887496ff3b9e8b17",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x68926484c82b22341cefec57131ef66f8ba0409d94e4a65e887496ff3b9e8b17",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "claim starting points (B)",
+        "wallet": "B",
+        "method": "claim_points",
+        "tx": "0xb8ffc8e7427c24e7e0ffc4ae0ef1105c93b4b27cfc6f1694b84092fbeab5d9e6",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xb8ffc8e7427c24e7e0ffc4ae0ef1105c93b4b27cfc6f1694b84092fbeab5d9e6",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "create T (timeout path; window 300s, timeout 60s)",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0x8870dce1962c15f6c48fc83debfc0ac45307b2819a31915987a6368f4fcef87a",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x8870dce1962c15f6c48fc83debfc0ac45307b2819a31915987a6368f4fcef87a",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 13
+      },
+      {
+        "step": "create S (sanity resolve)",
+        "wallet": "A",
+        "method": "create_market",
+        "tx": "0x58011d71f66e9b1be4afc0871ff5661c26de5c0bb3f6186daa064caab9f57f7b",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x58011d71f66e9b1be4afc0871ff5661c26de5c0bb3f6186daa064caab9f57f7b",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "stake YES 300 on T",
+        "wallet": "A",
+        "method": "stake",
+        "tx": "0x64c0024291b621808f31ee0c88b3ffa53aa12bfae9488456af8fab620545205b",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x64c0024291b621808f31ee0c88b3ffa53aa12bfae9488456af8fab620545205b",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "stake NO 200 on T",
+        "wallet": "B",
+        "method": "stake",
+        "tx": "0xc7b57fb6355e5de040eab64dd741b3d2d5e48ab499d3ef0ed9364dccbd974719",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xc7b57fb6355e5de040eab64dd741b3d2d5e48ab499d3ef0ed9364dccbd974719",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "resolve T",
+        "wallet": "A",
+        "method": "resolve",
+        "tx": "0xb89b340b82b7501508b282bede91e6a4a729c85f78e312b1a39e866e2211b714",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xb89b340b82b7501508b282bede91e6a4a729c85f78e312b1a39e866e2211b714",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 17
+      },
+      {
+        "step": "resolve S (sanity)",
+        "wallet": "B",
+        "method": "resolve",
+        "tx": "0xd2d6c6b6e35a68c36cf51df2ddae03b586ecedd874d27f0d3da1c7fe34095552",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xd2d6c6b6e35a68c36cf51df2ddae03b586ecedd874d27f0d3da1c7fe34095552",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 22
+      },
+      {
+        "step": "dispute T by B (bond 100)",
+        "wallet": "B",
+        "method": "dispute",
+        "tx": "0xfc0152e1856453a6961eb60c2a8814424f73b5dc7006537be42c9530d984c6f0",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xfc0152e1856453a6961eb60c2a8814424f73b5dc7006537be42c9530d984c6f0",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "expire_dispute T too early (expect revert)",
+        "wallet": "A",
+        "method": "expire_dispute",
+        "tx": "0xcfdf1c9137d0068d1ff5b87a9bda5ccf17be5ac66e0dba95a6b311049f08ad7f",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xcfdf1c9137d0068d1ff5b87a9bda5ccf17be5ac66e0dba95a6b311049f08ad7f",
+        "status": "ACCEPTED",
+        "execution": "ERROR",
+        "ok": false,
+        "expected": "revert",
+        "seconds": 4
+      },
+      {
+        "step": "expire_dispute T after timeout",
+        "wallet": "A",
+        "method": "expire_dispute",
+        "tx": "0xd5947480807cd90e45344fc029da994534ec8b10e52c8f54082d41f5ec41452e",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0xd5947480807cd90e45344fc029da994534ec8b10e52c8f54082d41f5ec41452e",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 9
+      },
+      {
+        "step": "claim refund T (A)",
+        "wallet": "A",
+        "method": "claim",
+        "tx": "0x7fcd8cd2bd0d153defb4afea24ae4869d86de2027ab4fc8a66c53833092d89df",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x7fcd8cd2bd0d153defb4afea24ae4869d86de2027ab4fc8a66c53833092d89df",
+        "status": "ACCEPTED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 4
+      },
+      {
+        "step": "claim refund T (B)",
+        "wallet": "B",
+        "method": "claim",
+        "tx": "0x7b0add35036a59720f695970ec115cb7f651dcb9b7671655acef610995278656",
+        "explorer": "https://explorer-studio.genlayer.com/transactions/0x7b0add35036a59720f695970ec115cb7f651dcb9b7671655acef610995278656",
+        "status": "FINALIZED",
+        "execution": "SUCCESS",
+        "ok": true,
+        "expected": "success",
+        "seconds": 196
+      }
+    ],
+    "bondCheck": {
+      "B_before_expire": 700,
+      "B_after_expire": 800,
+      "bond_returned": 100
+    },
+    "markets": {
+      "T": {
+        "category": "SPORTS",
+        "created_at": 1791777826,
+        "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "criteria": "Resolves YES if the cited source states that Argentina won the 2022 FIFA World Cup final (including on penalties); NO if it states another team won.",
+        "deadline": 1791777924,
+        "dispute_ends": 1791778244,
+        "dispute_open": false,
+        "dispute_reason": "Testing the timeout path: the appeal round is intentionally never run.",
+        "dispute_result": "TIMEOUT",
+        "dispute_source": "",
+        "dispute_timeout": 60,
+        "dispute_window": 300,
+        "disputed_at": 1791777982,
+        "disputer": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "finalized_at": 1791778051,
+        "id": 0,
+        "invalid_reason": "",
+        "no_total": 200,
+        "outcome": "YES",
+        "pool": 500,
+        "proposed_at": 1791777944,
+        "question": "Did Argentina win the 2022 FIFA World Cup final?",
+        "rounds": 2,
+        "slashed": 0,
+        "sources": [
+          "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
+        ],
+        "stakers": 2,
+        "status": "VOID_TIMEOUT",
+        "timeout_at": 1791778042,
+        "trusted_sources": [
+          true
+        ],
+        "yes_pct": 60,
+        "yes_total": 300
+      },
+      "S": {
+        "category": "SPORTS",
+        "created_at": 1791777838,
+        "creator": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "criteria": "Resolves YES if the cited source states Croatia won the 2018 FIFA World Cup final; NO if it states another team won.",
+        "deadline": 1791777939,
+        "dispute_ends": 1791778021,
+        "dispute_open": false,
+        "dispute_reason": "",
+        "dispute_result": "",
+        "dispute_source": "",
+        "dispute_timeout": 60,
+        "dispute_window": 60,
+        "disputed_at": 0,
+        "disputer": "",
+        "finalized_at": 0,
+        "id": 1,
+        "invalid_reason": "",
+        "no_total": 0,
+        "outcome": "NO",
+        "pool": 0,
+        "proposed_at": 1791777961,
+        "question": "Did Croatia win the 2018 FIFA World Cup final?",
+        "rounds": 1,
+        "slashed": 0,
+        "sources": [
+          "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+        ],
+        "stakers": 0,
+        "status": "PROPOSED",
+        "timeout_at": 0,
+        "trusted_sources": [
+          true
+        ],
+        "yes_pct": 50,
+        "yes_total": 0
+      }
+    },
+    "evidence": {
+      "T": [
+        {
+          "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+          "evidence_quote": "Argentina won the ensuing penalty shoot-out 4–2 to win their third World Cup, and their first since 1986.",
+          "kind": "INITIAL",
+          "outcome": "YES",
+          "reasoning": "The source explicitly states that Argentina won the 2022 FIFA World Cup final, including via penalties.",
+          "source_url": "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final",
+          "sources": [
+            "https://en.wikipedia.org/wiki/2022_FIFA_World_Cup_final"
+          ],
+          "timestamp": 1791777944
+        },
+        {
+          "caller": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+          "evidence_quote": "",
+          "kind": "TIMEOUT",
+          "outcome": "VOID",
+          "reasoning": "Appeal round did not complete within 60s of the dispute; market voided, all stakes refundable, dispute bond returned.",
+          "source_url": "",
+          "sources": [],
+          "timestamp": 1791778051
+        }
+      ],
+      "S": [
+        {
+          "caller": "0x4114320e6217407814992C42DC4573ea85A00b60",
+          "evidence_quote": "The final score was 4–2 to France.",
+          "kind": "INITIAL",
+          "outcome": "NO",
+          "reasoning": "The source explicitly states that France won the 2018 FIFA World Cup final with a score of 4–2, not Croatia.",
+          "source_url": "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final",
+          "sources": [
+            "https://en.wikipedia.org/wiki/2018_FIFA_World_Cup_final"
+          ],
+          "timestamp": 1791777961
+        }
+      ]
+    },
+    "users": {
+      "A": {
+        "address": "0xBb9E609bf277a0Ffb0018515d0a850037C2b17c3",
+        "balance": 1000,
+        "claimed_start": true,
+        "positions": [
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 0,
+            "no": 0,
+            "outcome": "YES",
+            "payout": 300,
+            "question": "Did Argentina win the 2022 FIFA World Cup final?",
+            "status": "VOID_TIMEOUT",
+            "yes": 300
+          }
+        ]
+      },
+      "B": {
+        "address": "0x4114320e6217407814992C42DC4573ea85A00b60",
+        "balance": 1000,
+        "claimed_start": true,
+        "positions": [
+          {
+            "claimable": 0,
+            "claimed": true,
+            "market_id": 0,
+            "no": 200,
+            "outcome": "YES",
+            "payout": 200,
+            "question": "Did Argentina win the 2022 FIFA World Cup final?",
+            "status": "VOID_TIMEOUT",
+            "yes": 0
+          }
+        ]
+      }
     }
-  ],
-  "stats": {
-    "by_status": {
-      "CLOSED": 0,
-      "DISPUTED": 0,
-      "FINALIZED": 2,
-      "INVALID": 1,
-      "OPEN": 0,
-      "PROPOSED": 0
-    },
-    "disputes": 1,
-    "flipped": 0,
-    "markets": 3,
-    "total_staked": 1000,
-    "users": 2
   }
 }
